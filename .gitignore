@@ -1,0 +1,23 @@
+# Executáveis compilados
+*.exe
+*.dll
+
+# Build artifacts
+build/
+dist/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# Frontend deps
+frontend/node_modules/
+
+# Misc
+*.log
+.DS_Store
+Thumbs.db
