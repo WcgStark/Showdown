@@ -17,9 +17,8 @@ echo === RELEASE v%VERSION% ===
 echo.
 
 :: Atualiza APP_VERSION no updater.py
-powershell -Command "(Get-Content updater.py -Raw) -replace 'APP_VERSION = \"[^\"]+\"', 'APP_VERSION = \"%VERSION%\"' | Set-Content updater.py -NoNewline"
+python _set_version.py %VERSION%
 if errorlevel 1 ( echo ERRO ao atualizar versao! & pause & exit /b 1 )
-echo [OK] APP_VERSION atualizado para %VERSION%
 
 :: Commit + tag + push
 "C:\Program Files\Git\bin\git.exe" add updater.py .gitignore .github
