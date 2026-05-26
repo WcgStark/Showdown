@@ -8,13 +8,13 @@ import tempfile
 import threading
 import urllib.request
 
-APP_VERSION = "1.0.0"
+APP_VERSION = "1.0.2"
 # ─── Configure your GitHub repo here ─────────────────────────────────────────
-GITHUB_OWNER = "SEU_USUARIO"   # ← substituir pelo seu usuário do GitHub
+GITHUB_OWNER = "WcgStark"   # ← substituir pelo seu usuário do GitHub
 GITHUB_REPO  = "Showdown"      # ← substituir pelo nome do repositório
 # ─────────────────────────────────────────────────────────────────────────────
 
-_API_URL = f"https://api.github.com/repos/{GITHUB_OWNER}/{GITHUB_REPO}/releases/latest"
+_API_URL = f"https://api.github.com/repos/WcgStark/Showdown/releases/latest"
 
 _state: dict = {"status": "idle", "value": 0, "tmp_path": ""}
 _lock = threading.Lock()
