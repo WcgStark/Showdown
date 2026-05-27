@@ -280,6 +280,10 @@ const App = () => {
             version={config.version}
             volume={volume}
             lang={lang}
+            onVolumeChange={setVolume}
+            quality={quality}
+            onQualityChange={setQuality}
+            onLangChange={setLang}
           />
         )}
 

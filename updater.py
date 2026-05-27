@@ -8,7 +8,7 @@ import tempfile
 import threading
 import urllib.request
 
-APP_VERSION = "1.1.9"
+APP_VERSION = "1.2.0"
 # ─── Configure your GitHub repo here ─────────────────────────────────────────
 GITHUB_OWNER = "WcgStark"   # ← substituir pelo seu usuário do GitHub
 GITHUB_REPO  = "Showdown"      # ← substituir pelo nome do repositório
@@ -156,8 +156,11 @@ def apply_update() -> bool:
         # the file, which makes the onefile bootloader fail to extract python3xx.dll.
         'Start-Sleep -Milliseconds 4000\n'
         '"[ps] settle done, launching" | Out-File $log -Append\n'
-        # Launch updated exe
-        'try { Start-Process -FilePath $dst; "[ps] launch succeeded" | Out-File $log -Append }\n'
+        # Launch via explorer.exe so the new exe runs in a clean shell context (exactly
+        # like a double-click) instead of as a child of this hidden PowerShell. Launching
+        # it as a PowerShell child was making the onefile bootloader fail to load
+        # python3xx.dll, while a manual relaunch always worked.
+        'try { Start-Process -FilePath "explorer.exe" -ArgumentList $dst; "[ps] launch succeeded" | Out-File $log -Append }\n'
         'catch { "[ps] launch failed: $_" | Out-File $log -Append }\n'
         # Keep PowerShell alive while the new exe finishes extracting its _MEI bundle.
         'Start-Sleep -Milliseconds 3000\n'

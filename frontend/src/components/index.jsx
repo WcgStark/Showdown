@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
+import { t } from '../i18n'
 
 /* ============ ICONS (simple, line) ============ */
 export const Icon = ({ name, size = 16 }) => {
@@ -17,6 +18,7 @@ export const Icon = ({ name, size = 16 }) => {
     timer: <g><circle cx="12" cy="13" r="8" /><path d="M12 8v5l3 2M9 3h6" /></g>,
     target: <g><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5" /><circle cx="12" cy="12" r="1.3" fill="currentColor" /></g>,
     cross: <g><path d="M6 6l12 12M18 6L6 18" /></g>,
+    gear: <g><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></g>,
   }
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="square">
@@ -86,6 +88,160 @@ export const ImgPh = ({ label = "PORTRAIT", aspect = "3 / 4", style }) => (
       <path d="M12 2v6M12 16v6M2 12h6M16 12h6" />
       <circle cx="12" cy="12" r="3" />
     </svg>
+  </div>
+)
+
+/* ============ Settings modal (shared) ============ */
+export const SettingsModal = ({ volume, onVolumeChange, quality, onQualityChange, lang, onLangChange, onClose }) => (
+  <div
+    onClick={onClose}
+    style={{
+      position: "absolute", inset: 0, zIndex: 50,
+      background: "rgba(7,8,12,0.85)", backdropFilter: "blur(8px)",
+      display: "flex", alignItems: "center", justifyContent: "center",
+    }}
+  >
+    <div
+      onClick={e => e.stopPropagation()}
+      style={{
+        width: 480,
+        background: "var(--bg-1)",
+        border: "1px solid var(--line-2)",
+        borderRadius: 16,
+        padding: "36px 40px",
+        maxHeight: "90vh",
+        overflowY: "auto",
+      }}
+    >
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
+        <div>
+          <div style={{ fontFamily: "var(--f-mono)", fontSize: 10, color: "var(--ink-3)", letterSpacing: "0.2em", marginBottom: 4 }}>
+            {t('configuration', lang)}
+          </div>
+          <div className="display" style={{ fontSize: 32, letterSpacing: "0.06em" }}>{t('settings', lang)}</div>
+        </div>
+        <button
+          onClick={onClose}
+          style={{
+            background: "var(--bg-glass)", border: "1px solid var(--line)",
+            color: "var(--ink-2)", cursor: "pointer",
+            width: 36, height: 36, borderRadius: 8,
+            fontFamily: "var(--f-mono)", fontSize: 18, lineHeight: 1,
+          }}
+        >×</button>
+      </div>
+
+      {/* Volume */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="square" style={{ color: "var(--ink-2)" }}>
+              <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            </svg>
+            <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-2)", letterSpacing: "0.16em" }}>
+              {t('audioVolume', lang)}
+            </span>
+          </div>
+          <span style={{ fontFamily: "var(--f-mono)", fontSize: 13, color: "var(--ink-0)", letterSpacing: "0.08em", minWidth: 40, textAlign: "right" }}>
+            {Math.round(volume * 100)}%
+          </span>
+        </div>
+
+        <input
+          type="range" min="0" max="1" step="0.05"
+          value={volume}
+          onChange={e => onVolumeChange(parseFloat(e.target.value))}
+          style={{ width: "100%", accentColor: "var(--acc)", cursor: "pointer", height: 4 }}
+        />
+
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <span style={{ fontFamily: "var(--f-mono)", fontSize: 9, color: "var(--ink-4)", letterSpacing: "0.12em" }}>{t('mute', lang)}</span>
+          <span style={{ fontFamily: "var(--f-mono)", fontSize: 9, color: "var(--ink-4)", letterSpacing: "0.12em" }}>{t('max', lang)}</span>
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div style={{ height: 1, background: "var(--line-2)", margin: "28px 0" }} />
+
+      {/* Quality */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="square" style={{ color: "var(--ink-2)" }}>
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+          </svg>
+          <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-2)", letterSpacing: "0.16em" }}>
+            {t('quality', lang)}
+          </span>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+          {[
+            { id: "rtx",    label: "RTX",    descKey: "rtxDesc"    },
+            { id: "potato", label: "POTATO", descKey: "potatoDesc" },
+          ].map(opt => (
+            <button
+              key={opt.id}
+              onClick={() => onQualityChange(opt.id)}
+              style={{
+                padding: "12px 16px",
+                background: quality === opt.id ? "color-mix(in oklab, var(--acc) 18%, transparent)" : "var(--bg-glass)",
+                border: `1px solid ${quality === opt.id ? "var(--acc)" : "var(--line-2)"}`,
+                borderRadius: 8, cursor: "pointer", textAlign: "left", transition: "all 120ms ease",
+              }}
+            >
+              <div style={{ fontFamily: "var(--f-display)", fontWeight: 700, fontSize: 14, color: quality === opt.id ? "var(--acc)" : "var(--ink-1)", letterSpacing: "0.12em", marginBottom: 4 }}>
+                {opt.label}
+              </div>
+              <div style={{ fontFamily: "var(--f-mono)", fontSize: 10, color: "var(--ink-3)", letterSpacing: "0.08em" }}>
+                {t(opt.descKey, lang)}
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div style={{ height: 1, background: "var(--line-2)", margin: "28px 0" }} />
+
+      {/* Language */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="square" style={{ color: "var(--ink-2)" }}>
+            <circle cx="12" cy="12" r="10" />
+            <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+          </svg>
+          <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-2)", letterSpacing: "0.16em" }}>
+            {t('language', lang)}
+          </span>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+          {[
+            { id: "en", labelKey: "langEn", descKey: "langEnDesc" },
+            { id: "pt", labelKey: "langPt", descKey: "langPtDesc" },
+          ].map(opt => (
+            <button
+              key={opt.id}
+              onClick={() => onLangChange(opt.id)}
+              style={{
+                padding: "12px 16px",
+                background: lang === opt.id ? "color-mix(in oklab, var(--acc) 18%, transparent)" : "var(--bg-glass)",
+                border: `1px solid ${lang === opt.id ? "var(--acc)" : "var(--line-2)"}`,
+                borderRadius: 8, cursor: "pointer", textAlign: "left", transition: "all 120ms ease",
+              }}
+            >
+              <div style={{ fontFamily: "var(--f-display)", fontWeight: 700, fontSize: 14, color: lang === opt.id ? "var(--acc)" : "var(--ink-1)", letterSpacing: "0.12em", marginBottom: 4 }}>
+                {t(opt.labelKey, lang)}
+              </div>
+              <div style={{ fontFamily: "var(--f-mono)", fontSize: 10, color: "var(--ink-3)", letterSpacing: "0.08em" }}>
+                {t(opt.descKey, lang)}
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
   </div>
 )
 

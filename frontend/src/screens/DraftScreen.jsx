@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Atmos, AppBar, Icon, CornerTicks } from '../components'
+import { Atmos, AppBar, Icon, CornerTicks, SettingsModal } from '../components'
 import { t } from '../i18n'
 
 /* ── Haki effect ─────────────────────────────────────────────────── */
@@ -261,7 +261,7 @@ const ActionBtn = ({ icon, label, hint, onClick, disabled, primary, fullWidth })
 /* ----- Right action panel ----- */
 const ActionPanel = ({
   universe, draft, spinning, reelChars, onSpin, onSkip, onUndo, onSwitch, onReady,
-  ready, imgUrl, onMenu, onPlayers, onPass, switchActive, lang,
+  ready, imgUrl, onMenu, onPlayers, onPass, onSettings, switchActive, lang,
 }) => {
   const turnLabel = draft.turn === "p1" ? "PLAYER 01" : "PLAYER 02"
   const skipsLeft = draft.turn === "p1" ? draft.skipsP1 : draft.skipsP2
@@ -391,9 +391,12 @@ const ActionPanel = ({
         <span className="kbd">ENTER</span>
       </button>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
         <button className="btn btn-ghost" onClick={onPlayers} style={{ height: 42, fontSize: 11 }}>
           <Icon name="user" size={14} /> {t('players', lang)}
+        </button>
+        <button className="btn btn-ghost" onClick={onSettings} style={{ height: 42, fontSize: 11 }}>
+          <Icon name="gear" size={14} /> {t('settings', lang)}
         </button>
         <button className="btn btn-ghost" onClick={onMenu} style={{ height: 42, fontSize: 11 }}>
           <Icon name="undo" size={14} /> {t('menu', lang)}
@@ -411,8 +414,10 @@ const DraftScreen = ({
   universe, p1, p2, draft, onFinish, mode,
   onGacha, onAssign, onSkip, onUndo, onSwitch, imgUrl,
   onMenu, onPlayers, onPass, version, volume, lang,
+  onVolumeChange, quality, onQualityChange, onLangChange,
 }) => {
   const positions = universe.positions
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   const filledP1 = draft.assignments.filter(a => a.p1 !== null).length
   const filledP2 = draft.assignments.filter(a => a.p2 !== null).length
@@ -572,9 +577,22 @@ const DraftScreen = ({
         onMenu={onMenu}
         onPlayers={onPlayers}
         onPass={handlePass}
+        onSettings={() => setSettingsOpen(true)}
         switchActive={switchMode}
         lang={lang}
       />
+
+      {settingsOpen && (
+        <SettingsModal
+          volume={volume}
+          onVolumeChange={onVolumeChange}
+          quality={quality}
+          onQualityChange={onQualityChange}
+          lang={lang}
+          onLangChange={onLangChange}
+          onClose={() => setSettingsOpen(false)}
+        />
+      )}
 
       {/* Haki cinematic overlay */}
       {hakiActive && <HakiOverlay volume={volume} onComplete={() => setHakiActive(false)} />}
