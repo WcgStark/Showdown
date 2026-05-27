@@ -50,7 +50,8 @@
       "Bash(python _set_version.py 1.1.5)",
       "Bash(python _set_version.py 1.1.6)",
       "Bash(python _set_version.py 1.1.7)",
-      "Bash(python _set_version.py 1.1.8)"
+      "Bash(python _set_version.py 1.1.8)",
+      "Bash(python _set_version.py 1.1.9)"
     ]
   }
 }
