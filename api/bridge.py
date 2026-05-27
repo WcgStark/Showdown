@@ -145,8 +145,10 @@ class GameAPI:
         return _updater.get_progress()
 
     def apply_update(self) -> bool:
+        import time as _time
         success = _updater.apply_update()
         if success:
+            _time.sleep(0.5)  # give PowerShell time to fully detach before window closes
             import webview as _wv
             for w in _wv.windows:
                 w.destroy()

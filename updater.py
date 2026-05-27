@@ -8,7 +8,7 @@ import tempfile
 import threading
 import urllib.request
 
-APP_VERSION = "1.0.7"
+APP_VERSION = "1.0.8"
 # ─── Configure your GitHub repo here ─────────────────────────────────────────
 GITHUB_OWNER = "WcgStark"   # ← substituir pelo seu usuário do GitHub
 GITHUB_REPO  = "Showdown"      # ← substituir pelo nome do repositório
@@ -102,6 +102,9 @@ def start_download(url: str) -> None:
     threading.Thread(target=_download_thread, args=(url,), daemon=True).start()
 
 
+_POWERSHELL = r"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+
+
 def apply_update() -> bool:
     """Launches a PowerShell helper that waits for this process to exit, then replaces the exe."""
     if not getattr(sys, "frozen", False):
@@ -117,6 +120,20 @@ def apply_update() -> bool:
     pid = os.getpid()
     mei_path = getattr(sys, "_MEIPASS", "")
     log_path = os.path.join(tempfile.gettempdir(), "showdown_update.log")
+    ps_path  = os.path.join(tempfile.gettempdir(), "showdown_update.ps1")
+
+    # Write Python-level diagnostic before touching PowerShell
+    try:
+        with open(log_path, "w", encoding="utf-8") as f:
+            f.write(f"[py] frozen={getattr(sys, 'frozen', False)}\n")
+            f.write(f"[py] pid={pid}\n")
+            f.write(f"[py] tmp_path={tmp_path}\n")
+            f.write(f"[py] tmp_exists={os.path.exists(tmp_path)}\n")
+            f.write(f"[py] current_exe={current_exe}\n")
+            f.write(f"[py] ps_path={ps_path}\n")
+            f.write(f"[py] powershell_exists={os.path.exists(_POWERSHELL)}\n")
+    except Exception:
+        pass
 
     ps = (
         f'$appPid = {pid}\n'
@@ -124,35 +141,47 @@ def apply_update() -> bool:
         f'$dst = "{current_exe}"\n'
         f'$mei = "{mei_path}"\n'
         f'$log = "{log_path}"\n'
-        '"[update] script started" | Out-File $log -Encoding utf8\n'
+        '"[ps] script started" | Out-File $log -Encoding utf8 -Append\n'
         # Wait until this process is fully gone ($PID is reserved — use $appPid)
         'while (Get-Process -Id $appPid -ErrorAction SilentlyContinue) { Start-Sleep -Milliseconds 300 }\n'
-        '"[update] process exited" | Out-File $log -Append\n'
+        '"[ps] process exited" | Out-File $log -Append\n'
         'Start-Sleep -Milliseconds 2000\n'
         # Clean up old MEI temp dir so the new exe starts fresh
         'if ($mei -and (Test-Path $mei)) { Remove-Item $mei -Recurse -Force -ErrorAction SilentlyContinue }\n'
-        '"[update] MEI cleaned" | Out-File $log -Append\n'
+        '"[ps] MEI cleaned" | Out-File $log -Append\n'
         # Copy new exe (retry up to 5x in case file is briefly locked)
         '$ok = $false\n'
         'for ($i = 0; $i -lt 5; $i++) {\n'
         '  try { Copy-Item -Path $src -Destination $dst -Force -ErrorAction Stop; $ok = $true; break }\n'
-        '  catch { "[update] copy attempt $i failed: $_" | Out-File $log -Append; Start-Sleep -Milliseconds 600 }\n'
+        '  catch { "[ps] copy attempt $i failed: $_" | Out-File $log -Append; Start-Sleep -Milliseconds 600 }\n'
         '}\n'
-        'if ($ok) { "[update] copy succeeded" | Out-File $log -Append } else { "[update] copy FAILED after retries" | Out-File $log -Append; exit 1 }\n'
+        'if ($ok) { "[ps] copy succeeded" | Out-File $log -Append } else { "[ps] copy FAILED" | Out-File $log -Append; exit 1 }\n'
         'Remove-Item $src -Force -ErrorAction SilentlyContinue\n'
         # Launch updated exe
-        'try { Start-Process -FilePath $dst; "[update] launch succeeded" | Out-File $log -Append }\n'
-        'catch { "[update] launch failed: $_" | Out-File $log -Append }\n'
-        # Delete this script
+        'try { Start-Process -FilePath $dst; "[ps] launch succeeded" | Out-File $log -Append }\n'
+        'catch { "[ps] launch failed: $_" | Out-File $log -Append }\n'
         'Remove-Item $PSCommandPath -Force -ErrorAction SilentlyContinue\n'
     )
 
-    ps_path = os.path.join(tempfile.gettempdir(), "showdown_update.ps1")
     with open(ps_path, "w", encoding="utf-8") as f:
         f.write(ps)
 
-    subprocess.Popen(
-        ["powershell", "-ExecutionPolicy", "Bypass", "-WindowStyle", "Hidden", "-File", ps_path],
-        creationflags=subprocess.DETACHED_PROCESS,
-    )
+    try:
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(f"[py] ps1 written, launching powershell\n")
+        subprocess.Popen(
+            [_POWERSHELL, "-ExecutionPolicy", "Bypass", "-WindowStyle", "Hidden", "-File", ps_path],
+            creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP,
+            close_fds=True,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(f"[py] Popen returned OK\n")
+    except Exception as e:
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(f"[py] Popen FAILED: {e}\n")
+        return False
+
     return True
