@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Atmos, AppBar, Icon, CornerTicks } from '../components'
+import { t } from '../i18n'
 
 const LANDSCAPE = {
   onepiece:   "./landscape/landscape%20onepiece.jpg",
@@ -62,7 +63,7 @@ const UniverseCard = ({ universe, active, onHover, onClick }) => {
   )
 }
 
-const SettingsModal = ({ volume, onVolumeChange, quality, onQualityChange, onClose }) => (
+const SettingsModal = ({ volume, onVolumeChange, quality, onQualityChange, lang, onLangChange, onClose }) => (
   <div
     onClick={onClose}
     style={{
@@ -79,15 +80,17 @@ const SettingsModal = ({ volume, onVolumeChange, quality, onQualityChange, onClo
         border: "1px solid var(--line-2)",
         borderRadius: 16,
         padding: "36px 40px",
+        maxHeight: "90vh",
+        overflowY: "auto",
       }}
     >
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
         <div>
           <div style={{ fontFamily: "var(--f-mono)", fontSize: 10, color: "var(--ink-3)", letterSpacing: "0.2em", marginBottom: 4 }}>
-            CONFIGURATION
+            {t('configuration', lang)}
           </div>
-          <div className="display" style={{ fontSize: 32, letterSpacing: "0.06em" }}>SETTINGS</div>
+          <div className="display" style={{ fontSize: 32, letterSpacing: "0.06em" }}>{t('settings', lang)}</div>
         </div>
         <button
           onClick={onClose}
@@ -110,7 +113,7 @@ const SettingsModal = ({ volume, onVolumeChange, quality, onQualityChange, onClo
               <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
             </svg>
             <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-2)", letterSpacing: "0.16em" }}>
-              AUDIO VOLUME
+              {t('audioVolume', lang)}
             </span>
           </div>
           <span style={{ fontFamily: "var(--f-mono)", fontSize: 13, color: "var(--ink-0)", letterSpacing: "0.08em", minWidth: 40, textAlign: "right" }}>
@@ -126,8 +129,8 @@ const SettingsModal = ({ volume, onVolumeChange, quality, onQualityChange, onClo
         />
 
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span style={{ fontFamily: "var(--f-mono)", fontSize: 9, color: "var(--ink-4)", letterSpacing: "0.12em" }}>MUTE</span>
-          <span style={{ fontFamily: "var(--f-mono)", fontSize: 9, color: "var(--ink-4)", letterSpacing: "0.12em" }}>MAX</span>
+          <span style={{ fontFamily: "var(--f-mono)", fontSize: 9, color: "var(--ink-4)", letterSpacing: "0.12em" }}>{t('mute', lang)}</span>
+          <span style={{ fontFamily: "var(--f-mono)", fontSize: 9, color: "var(--ink-4)", letterSpacing: "0.12em" }}>{t('max', lang)}</span>
         </div>
       </div>
 
@@ -141,13 +144,13 @@ const SettingsModal = ({ volume, onVolumeChange, quality, onQualityChange, onClo
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
           </svg>
           <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-2)", letterSpacing: "0.16em" }}>
-            QUALITY
+            {t('quality', lang)}
           </span>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
           {[
-            { id: "rtx", label: "RTX", desc: "Todas as iluminações ativas" },
-            { id: "potato", label: "POTATO", desc: "Sem efeitos de luz" },
+            { id: "rtx",    label: "RTX",    descKey: "rtxDesc"    },
+            { id: "potato", label: "POTATO", descKey: "potatoDesc" },
           ].map(opt => (
             <button
               key={opt.id}
@@ -156,17 +159,54 @@ const SettingsModal = ({ volume, onVolumeChange, quality, onQualityChange, onClo
                 padding: "12px 16px",
                 background: quality === opt.id ? "color-mix(in oklab, var(--acc) 18%, transparent)" : "var(--bg-glass)",
                 border: `1px solid ${quality === opt.id ? "var(--acc)" : "var(--line-2)"}`,
-                borderRadius: 8,
-                cursor: "pointer",
-                textAlign: "left",
-                transition: "all 120ms ease",
+                borderRadius: 8, cursor: "pointer", textAlign: "left", transition: "all 120ms ease",
               }}
             >
               <div style={{ fontFamily: "var(--f-display)", fontWeight: 700, fontSize: 14, color: quality === opt.id ? "var(--acc)" : "var(--ink-1)", letterSpacing: "0.12em", marginBottom: 4 }}>
                 {opt.label}
               </div>
               <div style={{ fontFamily: "var(--f-mono)", fontSize: 10, color: "var(--ink-3)", letterSpacing: "0.08em" }}>
-                {opt.desc}
+                {t(opt.descKey, lang)}
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div style={{ height: 1, background: "var(--line-2)", margin: "28px 0" }} />
+
+      {/* Language */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="square" style={{ color: "var(--ink-2)" }}>
+            <circle cx="12" cy="12" r="10" />
+            <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+          </svg>
+          <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-2)", letterSpacing: "0.16em" }}>
+            {t('language', lang)}
+          </span>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+          {[
+            { id: "en", labelKey: "langEn", descKey: "langEnDesc" },
+            { id: "pt", labelKey: "langPt", descKey: "langPtDesc" },
+          ].map(opt => (
+            <button
+              key={opt.id}
+              onClick={() => onLangChange(opt.id)}
+              style={{
+                padding: "12px 16px",
+                background: lang === opt.id ? "color-mix(in oklab, var(--acc) 18%, transparent)" : "var(--bg-glass)",
+                border: `1px solid ${lang === opt.id ? "var(--acc)" : "var(--line-2)"}`,
+                borderRadius: 8, cursor: "pointer", textAlign: "left", transition: "all 120ms ease",
+              }}
+            >
+              <div style={{ fontFamily: "var(--f-display)", fontWeight: 700, fontSize: 14, color: lang === opt.id ? "var(--acc)" : "var(--ink-1)", letterSpacing: "0.12em", marginBottom: 4 }}>
+                {t(opt.labelKey, lang)}
+              </div>
+              <div style={{ fontFamily: "var(--f-mono)", fontSize: 10, color: "var(--ink-3)", letterSpacing: "0.08em" }}>
+                {t(opt.descKey, lang)}
               </div>
             </button>
           ))}
@@ -176,7 +216,7 @@ const SettingsModal = ({ volume, onVolumeChange, quality, onQualityChange, onClo
   </div>
 )
 
-const LobbyScreen = ({ universes, onSelect, selectedId, setSelectedId, version, volume, onVolumeChange, quality, onQualityChange }) => {
+const LobbyScreen = ({ universes, onSelect, selectedId, setSelectedId, version, volume, onVolumeChange, quality, onQualityChange, lang, onLangChange }) => {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const sel = universes.find(u => u.id === selectedId) || universes[0]
   return (
@@ -190,7 +230,7 @@ const LobbyScreen = ({ universes, onSelect, selectedId, setSelectedId, version, 
         textAlign: "center", zIndex: 3,
       }}>
         <div className="label" style={{ justifyContent: "center", display: "inline-flex" }}>
-          STEP 01 / 03 — SELECT YOUR UNIVERSE
+          {t('step1', lang)}
         </div>
         <h1 className="display" style={{
           fontSize: 96, lineHeight: 0.95, margin: "16px 0 6px",
@@ -226,17 +266,17 @@ const LobbyScreen = ({ universes, onSelect, selectedId, setSelectedId, version, 
         display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 64px",
       }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-          <span className="label">CURRENT SELECTION</span>
+          <span className="label">{t('currentSelection', lang)}</span>
           <span className="display" style={{ fontSize: 28, color: "var(--ink-0)" }}>
             {sel.name} <span style={{ color: "var(--ink-3)", fontWeight: 500 }}>/ {sel.codename}</span>
           </span>
         </div>
         <div style={{ display: "flex", gap: 12 }}>
           <button className="btn btn-ghost" onClick={() => setSettingsOpen(true)}>
-            SETTINGS
+            {t('settings', lang)}
           </button>
           <button className="btn btn-primary" onClick={() => onSelect(sel.id)}>
-            CONFIRM SELECTION <Icon name="arrow" />
+            {t('confirmSelection', lang)} <Icon name="arrow" />
             <span className="kbd">ENTER</span>
           </button>
         </div>
@@ -248,6 +288,8 @@ const LobbyScreen = ({ universes, onSelect, selectedId, setSelectedId, version, 
           onVolumeChange={onVolumeChange}
           quality={quality}
           onQualityChange={onQualityChange}
+          lang={lang}
+          onLangChange={onLangChange}
           onClose={() => setSettingsOpen(false)}
         />
       )}

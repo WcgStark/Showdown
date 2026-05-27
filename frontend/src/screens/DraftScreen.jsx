@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Atmos, AppBar, Icon, CornerTicks } from '../components'
+import { t } from '../i18n'
 
 /* ── Haki effect ─────────────────────────────────────────────────── */
 // Portrait center inside the ActionPanel (right: 64, width: 380) at 1920×1080
@@ -74,7 +75,7 @@ const REEL_NAMES = [
 ]
 
 /* ----- Player banner ----- */
-const PlayerBanner = ({ side, player, filled, total, active, skips }) => {
+const PlayerBanner = ({ side, player, filled, total, active, skips, lang }) => {
   const isLeft = side === "left"
   return (
     <div style={{
@@ -104,7 +105,7 @@ const PlayerBanner = ({ side, player, filled, total, active, skips }) => {
 
       <div style={{ flex: 1, textAlign: isLeft ? "left" : "right", display: "flex", flexDirection: "column", gap: 6 }}>
         <div className="display-x" style={{ fontSize: 12, color: active ? "var(--acc)" : "var(--ink-3)" }}>
-          PLAYER {isLeft ? "01" : "02"} · {active ? "DRAFTING" : "STANDBY"}
+          PLAYER {isLeft ? "01" : "02"} · {active ? t('drafting', lang) : t('standby', lang)}
         </div>
         <div className="display" style={{ fontSize: 40, lineHeight: 1, letterSpacing: "0.04em" }}>
           {player || (isLeft ? "PLAYER ONE" : "PLAYER TWO")}
@@ -199,7 +200,7 @@ const SlotColumn = ({ side, positions, assignments, switchMode, switchFirst, onS
 )
 
 /* ----- Position column (center / drop targets) ----- */
-const PositionColumn = ({ positions, assignments, turn, enabled, onPick }) => (
+const PositionColumn = ({ positions, assignments, turn, enabled, onPick, lang }) => (
   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
     {positions.map((pos, i) => {
       const alreadyForTurn = assignments[i][turn] !== null
@@ -227,7 +228,7 @@ const PositionColumn = ({ positions, assignments, turn, enabled, onPick }) => (
         >
           {open && (
             <>
-              <span style={{ position: "absolute", top: 6, left: 8, fontSize: 10, fontFamily: "var(--f-mono)", color: "var(--acc)", letterSpacing: "0.2em" }}>DROP</span>
+              <span style={{ position: "absolute", top: 6, left: 8, fontSize: 10, fontFamily: "var(--f-mono)", color: "var(--acc)", letterSpacing: "0.2em" }}>{t('drop', lang)}</span>
               <span style={{ position: "absolute", top: 6, right: 8, fontSize: 10, fontFamily: "var(--f-mono)", color: "var(--acc)", letterSpacing: "0.2em" }}>{String(i + 1).padStart(2, "0")}</span>
             </>
           )}
@@ -260,7 +261,7 @@ const ActionBtn = ({ icon, label, hint, onClick, disabled, primary, fullWidth })
 /* ----- Right action panel ----- */
 const ActionPanel = ({
   universe, draft, spinning, reelChars, onSpin, onSkip, onUndo, onSwitch, onReady,
-  ready, imgUrl, onMenu, onPlayers, onPass, switchActive,
+  ready, imgUrl, onMenu, onPlayers, onPass, switchActive, lang,
 }) => {
   const turnLabel = draft.turn === "p1" ? "PLAYER 01" : "PLAYER 02"
   const skipsLeft = draft.turn === "p1" ? draft.skipsP1 : draft.skipsP2
@@ -279,7 +280,7 @@ const ActionPanel = ({
       }}>
         <CornerTicks />
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span className="label">CURRENT PICK</span>
+          <span className="label">{t('currentPick', lang)}</span>
           <span style={{ fontFamily: "var(--f-mono)", fontSize: 10, color: "var(--acc)", letterSpacing: "0.2em" }}>
             {draft.turn === "p1" ? "↩ FOR P1" : "FOR P2 ↪"}
           </span>
@@ -294,14 +295,14 @@ const ActionPanel = ({
 
           {!spinning && !draft.currentChar && (
             <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", color: "var(--ink-3)", fontFamily: "var(--f-mono)", fontSize: 11, letterSpacing: "0.2em", textAlign: "center", padding: 20 }}>
-              [ PRESS GACHA ]<br />
-              <span style={{ color: "var(--ink-4)", marginTop: 8, display: "inline-block" }}>NO PICK ACTIVE</span>
+              {t('pressGacha', lang)}<br />
+              <span style={{ color: "var(--ink-4)", marginTop: 8, display: "inline-block" }}>{t('noPickActive', lang)}</span>
             </div>
           )}
 
           {spinning && reelChars.length === 0 && (
             <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", color: "var(--ink-2)", fontFamily: "var(--f-mono)", fontSize: 11, letterSpacing: "0.2em" }}>
-              ROLLING…
+              {t('rolling', lang)}
             </div>
           )}
 
@@ -352,15 +353,15 @@ const ActionPanel = ({
 
         <div style={{ marginTop: 14, display: "flex", justifyContent: "space-between", fontFamily: "var(--f-mono)", fontSize: 11, letterSpacing: "0.14em" }}>
           <div>
-            <div style={{ color: "var(--ink-3)" }}>TURN</div>
+            <div style={{ color: "var(--ink-3)" }}>{t('turn', lang)}</div>
             <div style={{ color: "var(--ink-0)", fontWeight: 600 }}>{turnLabel}</div>
           </div>
           <div>
-            <div style={{ color: "var(--ink-3)" }}>SKIPS LEFT</div>
+            <div style={{ color: "var(--ink-3)" }}>{t('skipsLeft', lang)}</div>
             <div style={{ color: "var(--ink-0)", fontWeight: 600 }}>{skipsLeft} / 1</div>
           </div>
           <div>
-            <div style={{ color: "var(--ink-3)" }}>PICKS</div>
+            <div style={{ color: "var(--ink-3)" }}>{t('picks', lang)}</div>
             <div style={{ color: "var(--ink-0)", fontWeight: 600 }}>{draft.history.length} / {totalPositions * 2}</div>
           </div>
         </div>
@@ -368,15 +369,15 @@ const ActionPanel = ({
 
       {/* Action buttons */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-        <ActionBtn icon="dice" label="GACHA" hint="SPACE" primary
+        <ActionBtn icon="dice" label={t('gacha', lang)} hint="SPACE" primary
           onClick={onSpin} disabled={!!draft.currentChar || spinning || switchActive} fullWidth />
-        <ActionBtn icon="skip" label="SKIP" hint="S"
+        <ActionBtn icon="skip" label={t('skip', lang)} hint="S"
           onClick={onSkip} disabled={!draft.currentChar || skipsLeft <= 0} />
-        <ActionBtn icon="arrow" label="PASS" hint="P"
+        <ActionBtn icon="arrow" label={t('pass', lang)} hint="P"
           onClick={onPass} disabled={!!draft.currentChar || switchActive} />
-        <ActionBtn icon="swap" label="SWITCH" hint="W"
+        <ActionBtn icon="swap" label={t('switch', lang)} hint="W"
           onClick={onSwitch} disabled={!!draft.currentChar || switchActive || myFilled < 2} />
-        <ActionBtn icon="undo" label="UNDO" hint="Z"
+        <ActionBtn icon="undo" label={t('undo', lang)} hint="Z"
           onClick={onUndo} disabled={!draft.undoAvailable} />
       </div>
 
@@ -386,16 +387,16 @@ const ActionPanel = ({
         onClick={onReady}
         style={{ height: 64, fontSize: 16 }}
       >
-        <Icon name="check" size={18} /> READY · LOCK IN ROSTER
+        <Icon name="check" size={18} /> {t('readyLock', lang)}
         <span className="kbd">ENTER</span>
       </button>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
         <button className="btn btn-ghost" onClick={onPlayers} style={{ height: 42, fontSize: 11 }}>
-          <Icon name="user" size={14} /> PLAYERS
+          <Icon name="user" size={14} /> {t('players', lang)}
         </button>
         <button className="btn btn-ghost" onClick={onMenu} style={{ height: 42, fontSize: 11 }}>
-          <Icon name="undo" size={14} /> MENU
+          <Icon name="undo" size={14} /> {t('menu', lang)}
         </button>
       </div>
 
@@ -409,7 +410,7 @@ const ActionPanel = ({
 const DraftScreen = ({
   universe, p1, p2, draft, onFinish, mode,
   onGacha, onAssign, onSkip, onUndo, onSwitch, imgUrl,
-  onMenu, onPlayers, onPass, version, volume,
+  onMenu, onPlayers, onPass, version, volume, lang,
 }) => {
   const positions = universe.positions
 
@@ -506,11 +507,11 @@ const DraftScreen = ({
           borderBottom: "1px solid var(--acc-line)",
         }}>
           {switchFirst
-            ? `SWAP: selecionado "${switchFirst}" — escolha o segundo slot`
-            : "SWAP: selecione o primeiro slot para trocar"}
+            ? t('swapHint2', lang).replace('{slot}', switchFirst)
+            : t('swapHint1', lang)}
           <button onClick={() => { setSwitchMode(false); setSwitchFirst(null) }}
             style={{ marginLeft: 24, background: "transparent", border: "1px solid var(--acc-line)", color: "var(--ink-1)", padding: "4px 14px", cursor: "pointer", fontFamily: "var(--f-mono)", fontSize: 11 }}>
-            CANCELAR
+            {t('cancel', lang)}
           </button>
         </div>
       )}
@@ -518,11 +519,11 @@ const DraftScreen = ({
       {/* Player banners */}
       <PlayerBanner
         side="left" player={p1} filled={filledP1} total={positions.length}
-        active={draft.turn === "p1"} skips={draft.skipsP1}
+        active={draft.turn === "p1"} skips={draft.skipsP1} lang={lang}
       />
       <PlayerBanner
         side="right" player={p2} filled={filledP2} total={positions.length}
-        active={draft.turn === "p2"} skips={draft.skipsP2}
+        active={draft.turn === "p2"} skips={draft.skipsP2} lang={lang}
       />
 
       {/* MAIN GRID */}
@@ -544,6 +545,7 @@ const DraftScreen = ({
           turn={draft.turn}
           enabled={!!draft.currentChar && !switchMode}
           onPick={handleAssign}
+          lang={lang}
         />
         <SlotColumn
           side="p2" positions={positions} assignments={draft.assignments}
@@ -571,6 +573,7 @@ const DraftScreen = ({
         onPlayers={onPlayers}
         onPass={handlePass}
         switchActive={switchMode}
+        lang={lang}
       />
 
       {/* Haki cinematic overlay */}

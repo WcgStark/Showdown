@@ -1,6 +1,7 @@
 import { Atmos, AppBar, Icon, CornerTicks } from '../components'
+import { t } from '../i18n'
 
-const TeamSheet = ({ side, player, draft, universe, align, imgUrl }) => (
+const TeamSheet = ({ side, player, draft, universe, align, imgUrl, lang }) => (
   <div className="panel panel-tagged scanlines" style={{ position: "relative", padding: 20, overflow: "hidden" }}>
     <CornerTicks />
     <div style={{
@@ -16,7 +17,7 @@ const TeamSheet = ({ side, player, draft, universe, align, imgUrl }) => (
       </div>
       <div style={{ textAlign: "right", fontFamily: "var(--f-mono)", fontSize: 11, letterSpacing: "0.18em", color: "var(--ink-3)" }}>
         <div>{universe.tag}</div>
-        <div style={{ color: "var(--acc)" }}>{universe.positions.length} SLOTS</div>
+        <div style={{ color: "var(--acc)" }}>{universe.positions.length} {t('slots', lang)}</div>
       </div>
     </div>
 
@@ -54,7 +55,7 @@ const TeamSheet = ({ side, player, draft, universe, align, imgUrl }) => (
                 #{String(i + 1).padStart(2, "0")} · {pos.toUpperCase()}
               </span>
               <span className="display" style={{ fontSize: 18, lineHeight: 1.1, letterSpacing: "0.02em", color: a ? "var(--ink-0)" : "var(--ink-4)" }}>
-                {a ? a.name : "UNDRAFTED"}
+                {a ? a.name : t('undrafted', lang)}
               </span>
             </div>
           </div>
@@ -64,20 +65,20 @@ const TeamSheet = ({ side, player, draft, universe, align, imgUrl }) => (
   </div>
 )
 
-const ResultScreen = ({ universe, p1, p2, draft, onRestart, imgUrl, version }) => (
+const ResultScreen = ({ universe, p1, p2, draft, onRestart, imgUrl, version, lang }) => (
   <div className={`stage acc-${universe.id}`} data-screen-label="04 Result">
     <Atmos particles={true} />
     <AppBar phase="ROSTER LOCKED" universe={universe} mode="MATCH READY" step="03 / 03" version={version} />
 
     <div style={{ position: "absolute", top: 100, left: 0, right: 0, textAlign: "center" }}>
       <div className="label" style={{ justifyContent: "center", display: "inline-flex" }}>
-        DRAFT COMPLETE · DEBATE YOUR PICKS
+        {t('draftComplete', lang)}
       </div>
       <h1 className="display" style={{ fontSize: 76, margin: "10px 0 4px", letterSpacing: "0.04em" }}>
-        ROSTER <span style={{ color: "var(--acc)", textShadow: "0 0 32px color-mix(in oklab, var(--acc) 70%, transparent)" }}>LOCKED</span>
+        {t('rosterWord', lang)} <span style={{ color: "var(--acc)", textShadow: "0 0 32px color-mix(in oklab, var(--acc) 70%, transparent)" }}>{t('lockedWord', lang)}</span>
       </h1>
       <div style={{ color: "var(--ink-2)", fontFamily: "var(--f-mono)", fontSize: 12, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-        No winner declared · who built the better team?
+        {t('noWinner', lang)}
       </div>
     </div>
 
@@ -85,7 +86,7 @@ const ResultScreen = ({ universe, p1, p2, draft, onRestart, imgUrl, version }) =
       position: "absolute", top: 280, left: 64, right: 64, bottom: 140,
       display: "grid", gridTemplateColumns: "1fr 60px 1fr", gap: 16, alignItems: "stretch",
     }}>
-      <TeamSheet side="p1" player={p1 || "PLAYER ONE"} draft={draft} universe={universe} align="left" imgUrl={imgUrl} />
+      <TeamSheet side="p1" player={p1 || "PLAYER ONE"} draft={draft} universe={universe} align="left" imgUrl={imgUrl} lang={lang} />
 
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
         <div style={{ flex: 1, width: 1, background: "linear-gradient(180deg, transparent, var(--line-2), transparent)" }} />
@@ -93,12 +94,12 @@ const ResultScreen = ({ universe, p1, p2, draft, onRestart, imgUrl, version }) =
         <div style={{ flex: 1, width: 1, background: "linear-gradient(180deg, transparent, var(--line-2), transparent)" }} />
       </div>
 
-      <TeamSheet side="p2" player={p2 || "PLAYER TWO"} draft={draft} universe={universe} align="right" imgUrl={imgUrl} />
+      <TeamSheet side="p2" player={p2 || "PLAYER TWO"} draft={draft} universe={universe} align="right" imgUrl={imgUrl} lang={lang} />
     </div>
 
     <div style={{ position: "absolute", bottom: 60, left: 0, right: 0, zIndex: 3, display: "flex", justifyContent: "center", gap: 12 }}>
       <button className="btn btn-primary" onClick={onRestart}>
-        <Icon name="undo" /> NEW DRAFT
+        <Icon name="undo" /> {t('newDraft', lang)}
       </button>
     </div>
   </div>

@@ -49,6 +49,11 @@ const App = () => {
   )
   useEffect(() => { localStorage.setItem("hakiQuality", quality) }, [quality])
 
+  const [lang, setLang] = useState(
+    () => localStorage.getItem("hakiLang") ?? "en"
+  )
+  useEffect(() => { localStorage.setItem("hakiLang", lang) }, [lang])
+
   // ── Responsive layout: scale + center the 1920×1080 stage ────────────────
   useEffect(() => {
     const updateLayout = () => {
@@ -233,6 +238,8 @@ const App = () => {
             onVolumeChange={setVolume}
             quality={quality}
             onQualityChange={setQuality}
+            lang={lang}
+            onLangChange={setLang}
           />
         )}
 
@@ -249,6 +256,7 @@ const App = () => {
             onStart={handleStartGame}
             quickNames={config.quickNames}
             version={config.version}
+            lang={lang}
           />
         )}
 
@@ -271,6 +279,7 @@ const App = () => {
             onPass={handlePass}
             version={config.version}
             volume={volume}
+            lang={lang}
           />
         )}
 
@@ -283,6 +292,7 @@ const App = () => {
             onRestart={handleRestart}
             imgUrl={imgUrl}
             version={config.version}
+            lang={lang}
           />
         )}
       </div>

@@ -1,8 +1,9 @@
 import { Atmos, AppBar, Icon, CornerTicks } from '../components'
+import { t } from '../i18n'
 
 const QUICK_NAMES_FALLBACK = ["ALEX", "RYU", "MIKA", "JIN", "NOVA", "ZED", "KIRA", "OBI"]
 
-const PlayerCard = ({ side, value, setValue, align, quickNames }) => (
+const PlayerCard = ({ side, value, setValue, align, quickNames, lang }) => (
   <div className="panel panel-tagged" style={{ position: "relative", padding: 28, display: "flex", flexDirection: "column", justifyContent: "space-between", overflow: "hidden" }}>
     <CornerTicks />
     {/* background portrait */}
@@ -26,12 +27,12 @@ const PlayerCard = ({ side, value, setValue, align, quickNames }) => (
     {/* input */}
     <div style={{ position: "relative" }}>
       <div style={{ color: "var(--ink-3)", fontFamily: "var(--f-mono)", fontSize: 11, letterSpacing: "0.18em", marginBottom: 8 }}>
-        ENTER CALLSIGN
+        {t('enterCallsign', lang)}
       </div>
       <input
         value={value}
         onChange={e => setValue(e.target.value.slice(0, 14).toUpperCase())}
-        placeholder="TYPE NAME"
+        placeholder={t('typeName', lang)}
         style={{
           width: "100%",
           background: "transparent", border: 0, borderBottom: "2px solid var(--acc)",
@@ -41,14 +42,14 @@ const PlayerCard = ({ side, value, setValue, align, quickNames }) => (
         }}
       />
       <div style={{ display: "flex", justifyContent: "space-between", color: "var(--ink-3)", fontFamily: "var(--f-mono)", fontSize: 11, letterSpacing: "0.14em", marginTop: 6 }}>
-        <span>MAX 14 CHARS</span>
+        <span>{t('maxChars', lang)}</span>
         <span>{value.length} / 14</span>
       </div>
     </div>
 
     {/* quick names */}
     <div style={{ position: "relative" }}>
-      <div className="label" style={{ marginBottom: 10 }}>QUICK NAMES</div>
+      <div className="label" style={{ marginBottom: 10 }}>{t('quickNames', lang)}</div>
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
         {(quickNames || QUICK_NAMES_FALLBACK).map(n => (
           <button key={n} className="chip" onClick={() => setValue(n)}>{n}</button>
@@ -61,7 +62,7 @@ const PlayerCard = ({ side, value, setValue, align, quickNames }) => (
   </div>
 )
 
-const PlayersScreen = ({ universe, mode, setMode, p1, p2, setP1, setP2, onBack, onStart, quickNames, version }) => {
+const PlayersScreen = ({ universe, mode, setMode, p1, p2, setP1, setP2, onBack, onStart, quickNames, version, lang }) => {
   const resolvedQuickNames = (quickNames && quickNames.length)
     ? quickNames.map(n => n.toUpperCase())
     : QUICK_NAMES_FALLBACK
@@ -72,10 +73,10 @@ const PlayersScreen = ({ universe, mode, setMode, p1, p2, setP1, setP2, onBack, 
 
       <div style={{ position: "absolute", top: 110, left: 0, right: 0, textAlign: "center" }}>
         <div className="label" style={{ justifyContent: "center", display: "inline-flex" }}>
-          STEP 02 / 03 — DECLARE COMBATANTS
+          {t('step2', lang)}
         </div>
         <h1 className="display" style={{ fontSize: 64, margin: "12px 0 4px", letterSpacing: "0.04em" }}>
-          WHO'S DRAFTING?
+          {t('whoDrafting', lang)}
         </h1>
         <div style={{ color: "var(--ink-2)", fontFamily: "var(--f-mono)", fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase" }}>
           {universe.tag} · {universe.name.toUpperCase()}
@@ -87,7 +88,7 @@ const PlayersScreen = ({ universe, mode, setMode, p1, p2, setP1, setP2, onBack, 
         position: "absolute", top: 280, left: 120, right: 120, height: 460,
         display: "grid", gridTemplateColumns: "1fr 200px 1fr", gap: 28, alignItems: "stretch",
       }}>
-        <PlayerCard side="P1" value={p1} setValue={setP1} accent="var(--acc)" align="right" quickNames={resolvedQuickNames} />
+        <PlayerCard side="P1" value={p1} setValue={setP1} accent="var(--acc)" align="right" quickNames={resolvedQuickNames} lang={lang} />
 
         <div style={{ display: "grid", placeItems: "center", position: "relative" }}>
           {/* big VS */}
@@ -112,12 +113,12 @@ const PlayersScreen = ({ universe, mode, setMode, p1, p2, setP1, setP2, onBack, 
               VS
             </div>
             <div style={{ color: "var(--ink-3)", fontFamily: "var(--f-mono)", fontSize: 11, letterSpacing: "0.2em", marginTop: 6 }}>
-              BEST OF SIX
+              {t('bestOfSix', lang)}
             </div>
           </div>
         </div>
 
-        <PlayerCard side="P2" value={p2} setValue={setP2} accent="var(--acc)" align="left" quickNames={resolvedQuickNames} />
+        <PlayerCard side="P2" value={p2} setValue={setP2} accent="var(--acc)" align="left" quickNames={resolvedQuickNames} lang={lang} />
       </div>
 
       {/* Mode selector */}
@@ -125,7 +126,7 @@ const PlayersScreen = ({ universe, mode, setMode, p1, p2, setP1, setP2, onBack, 
         position: "absolute", left: 120, right: 120, top: 780,
         display: "flex", flexDirection: "column", alignItems: "center", gap: 16,
       }}>
-        <span className="label">MATCH FORMAT</span>
+        <span className="label">{t('matchFormat', lang)}</span>
         <div className="panel panel-tagged" style={{ display: "inline-flex", padding: 4, gap: 4 }}>
           {(universe.filters || []).map(f => {
             const on = mode === f.key
@@ -157,11 +158,11 @@ const PlayersScreen = ({ universe, mode, setMode, p1, p2, setP1, setP2, onBack, 
         display: "flex", justifyContent: "space-between", alignItems: "center",
       }}>
         <button className="btn btn-ghost" onClick={onBack}>
-          <Icon name="undo" /> BACK
+          <Icon name="undo" /> {t('back', lang)}
           <span className="kbd">ESC</span>
         </button>
         <button className="btn btn-primary" onClick={onStart} disabled={!p1.trim() || !p2.trim()}>
-          ENTER THE DRAFT <Icon name="arrow" />
+          {t('enterDraft', lang)} <Icon name="arrow" />
           <span className="kbd">ENTER</span>
         </button>
       </div>
