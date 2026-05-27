@@ -40,6 +40,11 @@ const App = () => {
   )
   useEffect(() => { localStorage.setItem("hakiVolume", volume) }, [volume])
 
+  const [quality, setQuality] = useState(
+    () => localStorage.getItem("hakiQuality") ?? "rtx"
+  )
+  useEffect(() => { localStorage.setItem("hakiQuality", quality) }, [quality])
+
   // ── Responsive layout: scale + center the 1920×1080 stage ────────────────
   useEffect(() => {
     const updateLayout = () => {
@@ -212,7 +217,7 @@ const App = () => {
   return (
     <>
     <div className="stage-wrap">
-      <div className="stage" style={{ transform: `scale(${layout.scale})`, left: layout.x, top: layout.y }}>
+      <div className={`stage${quality === "potato" ? " potato" : ""}`} style={{ transform: `scale(${layout.scale})`, left: layout.x, top: layout.y }}>
         {screen === "lobby" && (
           <LobbyScreen
             universes={config.universes}
@@ -222,6 +227,8 @@ const App = () => {
             version={config.version}
             volume={volume}
             onVolumeChange={setVolume}
+            quality={quality}
+            onQualityChange={setQuality}
           />
         )}
 

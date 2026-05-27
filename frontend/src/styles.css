@@ -362,3 +362,29 @@ body { min-height: 100vh; overflow-x: hidden; }
   70%     { transform: translate(-2px,1px); }
   80%     { transform: translate(2px,-1px); }
 }
+
+/* ── Potato mode: disable all UI lighting/glow ── */
+.potato .bg-glow    { display: none; }
+.potato .particles  { display: none; }
+.potato .bg-noise   { display: none; }
+.potato .scanlines::after { display: none; }
+
+.potato * { text-shadow: none !important; }
+
+.potato .ring-on {
+  box-shadow: none;
+  border-color: var(--acc) !important;
+}
+.potato .brand .mark {
+  box-shadow: none;
+}
+.potato .label::before {
+  box-shadow: none;
+}
+.potato .btn-primary {
+  box-shadow: none;
+}
+.potato .particles .p {
+  box-shadow: none;
+  animation: none;
+}

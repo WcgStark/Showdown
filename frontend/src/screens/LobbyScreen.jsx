@@ -62,7 +62,7 @@ const UniverseCard = ({ universe, active, onHover, onClick }) => {
   )
 }
 
-const SettingsModal = ({ volume, onVolumeChange, onClose }) => (
+const SettingsModal = ({ volume, onVolumeChange, quality, onQualityChange, onClose }) => (
   <div
     onClick={onClose}
     style={{
@@ -130,11 +130,53 @@ const SettingsModal = ({ volume, onVolumeChange, onClose }) => (
           <span style={{ fontFamily: "var(--f-mono)", fontSize: 9, color: "var(--ink-4)", letterSpacing: "0.12em" }}>MAX</span>
         </div>
       </div>
+
+      {/* Divider */}
+      <div style={{ height: 1, background: "var(--line-2)", margin: "28px 0" }} />
+
+      {/* Quality */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="square" style={{ color: "var(--ink-2)" }}>
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+          </svg>
+          <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-2)", letterSpacing: "0.16em" }}>
+            QUALITY
+          </span>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+          {[
+            { id: "rtx", label: "RTX", desc: "Todas as iluminações ativas" },
+            { id: "potato", label: "POTATO", desc: "Sem efeitos de luz" },
+          ].map(opt => (
+            <button
+              key={opt.id}
+              onClick={() => onQualityChange(opt.id)}
+              style={{
+                padding: "12px 16px",
+                background: quality === opt.id ? "color-mix(in oklab, var(--acc) 18%, transparent)" : "var(--bg-glass)",
+                border: `1px solid ${quality === opt.id ? "var(--acc)" : "var(--line-2)"}`,
+                borderRadius: 8,
+                cursor: "pointer",
+                textAlign: "left",
+                transition: "all 120ms ease",
+              }}
+            >
+              <div style={{ fontFamily: "var(--f-display)", fontWeight: 700, fontSize: 14, color: quality === opt.id ? "var(--acc)" : "var(--ink-1)", letterSpacing: "0.12em", marginBottom: 4 }}>
+                {opt.label}
+              </div>
+              <div style={{ fontFamily: "var(--f-mono)", fontSize: 10, color: "var(--ink-3)", letterSpacing: "0.08em" }}>
+                {opt.desc}
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   </div>
 )
 
-const LobbyScreen = ({ universes, onSelect, selectedId, setSelectedId, version, volume, onVolumeChange }) => {
+const LobbyScreen = ({ universes, onSelect, selectedId, setSelectedId, version, volume, onVolumeChange, quality, onQualityChange }) => {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const sel = universes.find(u => u.id === selectedId) || universes[0]
   return (
@@ -204,6 +246,8 @@ const LobbyScreen = ({ universes, onSelect, selectedId, setSelectedId, version, 
         <SettingsModal
           volume={volume}
           onVolumeChange={onVolumeChange}
+          quality={quality}
+          onQualityChange={onQualityChange}
           onClose={() => setSettingsOpen(false)}
         />
       )}
