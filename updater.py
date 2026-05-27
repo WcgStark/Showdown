@@ -8,7 +8,7 @@ import tempfile
 import threading
 import urllib.request
 
-APP_VERSION = "1.1.5"
+APP_VERSION = "1.1.6"
 # ─── Configure your GitHub repo here ─────────────────────────────────────────
 GITHUB_OWNER = "WcgStark"   # ← substituir pelo seu usuário do GitHub
 GITHUB_REPO  = "Showdown"      # ← substituir pelo nome do repositório
@@ -119,7 +119,6 @@ def apply_update() -> bool:
 
     current_exe = sys.executable
     pid = os.getpid()
-    mei_path = getattr(sys, "_MEIPASS", "")
     log_path = os.path.join(tempfile.gettempdir(), "showdown_update.log")
     ps_path  = os.path.join(tempfile.gettempdir(), "showdown_update.ps1")
 
@@ -140,16 +139,11 @@ def apply_update() -> bool:
         f'$appPid = {pid}\n'
         f'$src = "{tmp_path}"\n'
         f'$dst = "{current_exe}"\n'
-        f'$mei = "{mei_path}"\n'
         f'$log = "{log_path}"\n'
         '"[ps] script started" | Out-File $log -Encoding utf8 -Append\n'
-        # Wait until this process is fully gone ($PID is reserved — use $appPid)
         'while (Get-Process -Id $appPid -ErrorAction SilentlyContinue) { Start-Sleep -Milliseconds 300 }\n'
         '"[ps] process exited" | Out-File $log -Append\n'
         'Start-Sleep -Milliseconds 2000\n'
-        # Clean up old MEI temp dir so the new exe starts fresh
-        'if ($mei -and (Test-Path $mei)) { Remove-Item $mei -Recurse -Force -ErrorAction SilentlyContinue }\n'
-        '"[ps] MEI cleaned" | Out-File $log -Append\n'
         # Copy new exe (retry up to 5x in case file is briefly locked)
         '$ok = $false\n'
         'for ($i = 0; $i -lt 5; $i++) {\n'
