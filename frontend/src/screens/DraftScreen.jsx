@@ -432,7 +432,7 @@ const ActionPanel = ({
 const DraftScreen = ({
   universe, p1, p2, draft, onFinish, mode,
   onGacha, onAssign, onSkip, onUndo, onSwitch, imgUrl,
-  onMenu, onPlayers, onPass,
+  onMenu, onPlayers, onPass, version,
 }) => {
   const positions = universe.positions
 
@@ -521,7 +521,7 @@ const DraftScreen = ({
   return (
     <div className={`stage acc-${universe.id}`} data-screen-label="03 Draft">
       <Atmos particles={false} grid={true} />
-      <AppBar phase="DRAFTING" universe={universe} mode={mode} step={`${totalPicks} / ${positions.length * 2}`} />
+      <AppBar phase="DRAFTING" universe={universe} mode={mode} step={`${totalPicks} / ${positions.length * 2}`} version={version} />
 
       {switchMode && (
         <div style={{

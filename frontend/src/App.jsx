@@ -214,6 +214,7 @@ const App = () => {
             onSelect={handleSelectUniverse}
             selectedId={selectedId}
             setSelectedId={setSelectedId}
+            version={config.version}
           />
         )}
 
@@ -229,6 +230,7 @@ const App = () => {
             onBack={() => setScreen("lobby")}
             onStart={handleStartGame}
             quickNames={config.quickNames}
+            version={config.version}
           />
         )}
 
@@ -249,6 +251,7 @@ const App = () => {
             onMenu={handleRestart}
             onPlayers={() => setScreen("players")}
             onPass={handlePass}
+            version={config.version}
           />
         )}
 
@@ -260,6 +263,7 @@ const App = () => {
             draft={draft}
             onRestart={handleRestart}
             imgUrl={imgUrl}
+            version={config.version}
           />
         )}
       </div>

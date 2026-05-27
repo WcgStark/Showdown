@@ -61,14 +61,14 @@ const PlayerCard = ({ side, value, setValue, align, quickNames }) => (
   </div>
 )
 
-const PlayersScreen = ({ universe, mode, setMode, p1, p2, setP1, setP2, onBack, onStart, quickNames }) => {
+const PlayersScreen = ({ universe, mode, setMode, p1, p2, setP1, setP2, onBack, onStart, quickNames, version }) => {
   const resolvedQuickNames = (quickNames && quickNames.length)
     ? quickNames.map(n => n.toUpperCase())
     : QUICK_NAMES_FALLBACK
   return (
     <div className={`stage acc-${universe.id}`} data-screen-label="02 Players">
       <Atmos particles={false} />
-      <AppBar phase="ROSTER" universe={universe} mode={mode} step="02 / 03" />
+      <AppBar phase="ROSTER" universe={universe} mode={mode} step="02 / 03" version={version} />
 
       <div style={{ position: "absolute", top: 110, left: 0, right: 0, textAlign: "center" }}>
         <div className="label" style={{ justifyContent: "center", display: "inline-flex" }}>

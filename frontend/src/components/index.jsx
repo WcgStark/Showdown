@@ -60,13 +60,13 @@ export const Atmos = ({ glow = true, grid = true, particles = true }) => (
 )
 
 /* ============ AppBar ============ */
-export const AppBar = ({ phase = "LOBBY", universe, mode, step }) => (
+export const AppBar = ({ phase = "LOBBY", universe, mode, step, version }) => (
   <div className="appbar">
     <div className="brand">
       <div className="mark" />
       <span>SHOWDOWN</span>
       <span style={{ color: "var(--ink-3)", letterSpacing: "0.18em", fontWeight: 500, fontSize: 11, marginLeft: 6 }}>
-        / Draft v.2.1
+        / Draft v.{version || "?"}
       </span>
     </div>
     <div className="meta">

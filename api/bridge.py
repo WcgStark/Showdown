@@ -46,7 +46,7 @@ class GameAPI:
                 "defaultFilter": u.default_filter,
                 "assetFolder": u.asset_folder,
             })
-        return {"universes": universes, "quickNames": QUICK_NAMES}
+        return {"universes": universes, "quickNames": QUICK_NAMES, "version": _updater.APP_VERSION}
 
     # ── Match lifecycle ───────────────────────────────────────────────────────
 

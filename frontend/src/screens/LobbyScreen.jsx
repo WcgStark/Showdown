@@ -63,12 +63,12 @@ const UniverseCard = ({ universe, active, onHover, onClick }) => {
   )
 }
 
-const LobbyScreen = ({ universes, onSelect, selectedId, setSelectedId }) => {
+const LobbyScreen = ({ universes, onSelect, selectedId, setSelectedId, version }) => {
   const sel = universes.find(u => u.id === selectedId) || universes[0]
   return (
     <div className={`stage acc-${sel.id}`} data-screen-label="01 Lobby">
       <Atmos />
-      <AppBar phase="LOBBY" />
+      <AppBar phase="LOBBY" version={version} />
 
       {/* Title block */}
       <div style={{
