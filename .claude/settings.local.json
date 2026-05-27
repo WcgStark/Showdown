@@ -48,7 +48,8 @@
       "Bash(cd \"c:\\\\Users\\\\willi\\\\Downloads\\\\Showdown\\\\frontend\" && npm run build 2>&1 | tail -3 && cd .. && pyinstaller --noconfirm showdown.spec 2>&1 | tail -3)",
       "Read(//c/Users/willi/Downloads/**)",
       "Bash(python _set_version.py 1.1.5)",
-      "Bash(python _set_version.py 1.1.6)"
+      "Bash(python _set_version.py 1.1.6)",
+      "Bash(python _set_version.py 1.1.7)"
     ]
   }
 }
