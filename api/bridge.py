@@ -148,10 +148,9 @@ class GameAPI:
         import time as _time
         success = _updater.apply_update()
         if success:
-            _time.sleep(0.5)  # give PowerShell time to fully detach before window closes
-            import webview as _wv
-            for w in _wv.windows:
-                w.destroy()
+            _time.sleep(0.8)  # give PowerShell time to fully detach before dying
+            import os as _os
+            _os._exit(0)     # hard kill — guarantees the PID disappears so PowerShell can proceed
         return success
 
     # ── Internal ──────────────────────────────────────────────────────────────
