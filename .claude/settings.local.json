@@ -42,7 +42,8 @@
       "Bash(python _set_version.py 1.1.1)",
       "Bash(npm run *)",
       "Bash(pyinstaller --noconfirm showdown.spec)",
-      "Bash(python _set_version.py 1.1.2)"
+      "Bash(python _set_version.py 1.1.2)",
+      "Bash(python _set_version.py 1.1.3)"
     ]
   }
 }
