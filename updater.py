@@ -103,7 +103,7 @@ def start_download(url: str) -> None:
 
 
 def apply_update() -> bool:
-    """Creates a helper .bat that replaces the exe after the app closes, then launches it."""
+    """Launches a PowerShell helper that waits for this process to exit, then replaces the exe."""
     if not getattr(sys, "frozen", False):
         return False
 
@@ -114,21 +114,34 @@ def apply_update() -> bool:
         return False
 
     current_exe = sys.executable
-    bat = (
-        "@echo off\n"
-        "ping 127.0.0.1 -n 3 > nul\n"
-        f'copy /Y "{tmp_path}" "{current_exe}"\n'
-        f'if errorlevel 1 ( ping 127.0.0.1 -n 2 > nul & copy /Y "{tmp_path}" "{current_exe}" )\n'
-        f'del "{tmp_path}"\n'
-        f'start "" "{current_exe}"\n'
-        "del \"%~f0\"\n"
+    pid = os.getpid()
+    mei_path = getattr(sys, "_MEIPASS", "")
+
+    ps = (
+        f'$pid = {pid}\n'
+        f'$src = "{tmp_path}"\n'
+        f'$dst = "{current_exe}"\n'
+        f'$mei = "{mei_path}"\n'
+        # Wait until this process is fully gone
+        'while (Get-Process -Id $pid -ErrorAction SilentlyContinue) { Start-Sleep -Milliseconds 300 }\n'
+        'Start-Sleep -Milliseconds 800\n'
+        # Clean up old MEI temp dir so the new exe starts fresh
+        'if ($mei -and (Test-Path $mei)) { Remove-Item $mei -Recurse -Force -ErrorAction SilentlyContinue }\n'
+        # Copy new exe
+        'Copy-Item -Path $src -Destination $dst -Force\n'
+        'Remove-Item $src -Force -ErrorAction SilentlyContinue\n'
+        # Launch updated exe
+        'Start-Process $dst\n'
+        # Delete this script
+        'Remove-Item $PSCommandPath -Force -ErrorAction SilentlyContinue\n'
     )
-    bat_path = os.path.join(tempfile.gettempdir(), "showdown_update.bat")
-    with open(bat_path, "w", encoding="utf-8") as f:
-        f.write(bat)
+
+    ps_path = os.path.join(tempfile.gettempdir(), "showdown_update.ps1")
+    with open(ps_path, "w", encoding="utf-8") as f:
+        f.write(ps)
 
     subprocess.Popen(
-        ["cmd", "/c", bat_path],
-        creationflags=subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS,
+        ["powershell", "-ExecutionPolicy", "Bypass", "-WindowStyle", "Hidden", "-File", ps_path],
+        creationflags=subprocess.DETACHED_PROCESS,
     )
     return True
