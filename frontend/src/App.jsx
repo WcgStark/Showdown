@@ -35,6 +35,11 @@ const App = () => {
   const [updateProgress, setUpdateProgress] = useState(0)
   const [updateDismissed, setUpdateDismissed] = useState(false)
 
+  const [volume, setVolume] = useState(
+    () => parseFloat(localStorage.getItem("hakiVolume") ?? "0.9")
+  )
+  useEffect(() => { localStorage.setItem("hakiVolume", volume) }, [volume])
+
   // ── Responsive layout: scale + center the 1920×1080 stage ────────────────
   useEffect(() => {
     const updateLayout = () => {
@@ -215,6 +220,8 @@ const App = () => {
             selectedId={selectedId}
             setSelectedId={setSelectedId}
             version={config.version}
+            volume={volume}
+            onVolumeChange={setVolume}
           />
         )}
 
@@ -252,6 +259,7 @@ const App = () => {
             onPlayers={() => setScreen("players")}
             onPass={handlePass}
             version={config.version}
+            volume={volume}
           />
         )}
 

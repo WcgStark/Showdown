@@ -39,7 +39,7 @@ if errorlevel 1 ( echo ERRO ao gerar .exe! & pause & exit /b 1 )
 :: [4/4] Publica no GitHub
 echo.
 echo [4/4] Publicando no GitHub...
-%GIT% add updater.py
+%GIT% add -u
 %GIT% commit -m "release v%VERSION%"
 %GIT% push
 gh release create v%VERSION% "dist\Showdown Draft.exe" --title "Versao %VERSION%" --notes ""

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Atmos, AppBar, Icon, CornerTicks } from '../components'
 
 const LANDSCAPE = {
@@ -37,14 +38,12 @@ const UniverseCard = ({ universe, active, onHover, onClick }) => {
           }}
         />
       )}
-      {/* gradient overlay */}
       <div style={{
         position: "absolute", inset: 0,
         background:
           `linear-gradient(180deg, rgba(7,8,12,0.35) 0%, rgba(7,8,12,0.5) 50%, rgba(7,8,12,0.95) 100%)`,
       }} />
 
-      {/* big title */}
       <div style={{ position: "absolute", bottom: 28, left: 28, right: 28 }}>
         <div className="display" style={{ fontSize: 56, lineHeight: 0.95, marginBottom: 0 }}>
           {universe.name}
@@ -63,7 +62,80 @@ const UniverseCard = ({ universe, active, onHover, onClick }) => {
   )
 }
 
-const LobbyScreen = ({ universes, onSelect, selectedId, setSelectedId, version }) => {
+const SettingsModal = ({ volume, onVolumeChange, onClose }) => (
+  <div
+    onClick={onClose}
+    style={{
+      position: "absolute", inset: 0, zIndex: 50,
+      background: "rgba(7,8,12,0.85)", backdropFilter: "blur(8px)",
+      display: "flex", alignItems: "center", justifyContent: "center",
+    }}
+  >
+    <div
+      onClick={e => e.stopPropagation()}
+      style={{
+        width: 480,
+        background: "var(--bg-1)",
+        border: "1px solid var(--line-2)",
+        borderRadius: 16,
+        padding: "36px 40px",
+      }}
+    >
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
+        <div>
+          <div style={{ fontFamily: "var(--f-mono)", fontSize: 10, color: "var(--ink-3)", letterSpacing: "0.2em", marginBottom: 4 }}>
+            CONFIGURATION
+          </div>
+          <div className="display" style={{ fontSize: 32, letterSpacing: "0.06em" }}>SETTINGS</div>
+        </div>
+        <button
+          onClick={onClose}
+          style={{
+            background: "var(--bg-glass)", border: "1px solid var(--line)",
+            color: "var(--ink-2)", cursor: "pointer",
+            width: 36, height: 36, borderRadius: 8,
+            fontFamily: "var(--f-mono)", fontSize: 18, lineHeight: 1,
+          }}
+        >×</button>
+      </div>
+
+      {/* Volume */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="square" style={{ color: "var(--ink-2)" }}>
+              <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            </svg>
+            <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-2)", letterSpacing: "0.16em" }}>
+              AUDIO VOLUME
+            </span>
+          </div>
+          <span style={{ fontFamily: "var(--f-mono)", fontSize: 13, color: "var(--ink-0)", letterSpacing: "0.08em", minWidth: 40, textAlign: "right" }}>
+            {Math.round(volume * 100)}%
+          </span>
+        </div>
+
+        <input
+          type="range" min="0" max="1" step="0.05"
+          value={volume}
+          onChange={e => onVolumeChange(parseFloat(e.target.value))}
+          style={{ width: "100%", accentColor: "var(--acc)", cursor: "pointer", height: 4 }}
+        />
+
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <span style={{ fontFamily: "var(--f-mono)", fontSize: 9, color: "var(--ink-4)", letterSpacing: "0.12em" }}>MUTE</span>
+          <span style={{ fontFamily: "var(--f-mono)", fontSize: 9, color: "var(--ink-4)", letterSpacing: "0.12em" }}>MAX</span>
+        </div>
+      </div>
+    </div>
+  </div>
+)
+
+const LobbyScreen = ({ universes, onSelect, selectedId, setSelectedId, version, volume, onVolumeChange }) => {
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const sel = universes.find(u => u.id === selectedId) || universes[0]
   return (
     <div className={`stage acc-${sel.id}`} data-screen-label="01 Lobby">
@@ -118,12 +190,23 @@ const LobbyScreen = ({ universes, onSelect, selectedId, setSelectedId, version }
           </span>
         </div>
         <div style={{ display: "flex", gap: 12 }}>
+          <button className="btn btn-ghost" onClick={() => setSettingsOpen(true)}>
+            SETTINGS
+          </button>
           <button className="btn btn-primary" onClick={() => onSelect(sel.id)}>
             CONFIRM SELECTION <Icon name="arrow" />
             <span className="kbd">ENTER</span>
           </button>
         </div>
       </div>
+
+      {settingsOpen && (
+        <SettingsModal
+          volume={volume}
+          onVolumeChange={onVolumeChange}
+          onClose={() => setSettingsOpen(false)}
+        />
+      )}
     </div>
   )
 }

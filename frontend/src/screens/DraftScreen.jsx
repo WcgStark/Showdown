@@ -260,7 +260,7 @@ const ActionBtn = ({ icon, label, hint, onClick, disabled, primary, fullWidth })
 /* ----- Right action panel ----- */
 const ActionPanel = ({
   universe, draft, spinning, reelChars, onSpin, onSkip, onUndo, onSwitch, onReady,
-  ready, imgUrl, onMenu, onPlayers, onPass, switchActive, hakiVolume, setHakiVolume,
+  ready, imgUrl, onMenu, onPlayers, onPass, switchActive,
 }) => {
   const turnLabel = draft.turn === "p1" ? "PLAYER 01" : "PLAYER 02"
   const skipsLeft = draft.turn === "p1" ? draft.skipsP1 : draft.skipsP2
@@ -399,29 +399,6 @@ const ActionPanel = ({
         </button>
       </div>
 
-      {/* Volume control for haki sound */}
-      <div style={{
-        display: "flex", alignItems: "center", gap: 8,
-        padding: "6px 10px",
-        background: "var(--bg-glass)", border: "1px solid var(--line)",
-        pointerEvents: "auto",
-      }}>
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="square" style={{ color: "var(--ink-2)", flexShrink: 0 }}>
-          <path d="M11 5L6 9H2v6h4l5 4V5z"/>
-          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
-          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-        </svg>
-        <span style={{ fontFamily: "var(--f-mono)", fontSize: 9, color: "var(--ink-3)", letterSpacing: "0.2em", flexShrink: 0 }}>SOUND</span>
-        <input
-          type="range" min="0" max="1" step="0.05"
-          value={hakiVolume}
-          onChange={e => setHakiVolume(parseFloat(e.target.value))}
-          style={{ flex: 1, accentColor: "var(--acc)", cursor: "pointer" }}
-        />
-        <span style={{ fontFamily: "var(--f-mono)", fontSize: 10, color: "var(--ink-1)", letterSpacing: "0.08em", width: 32, textAlign: "right" }}>
-          {Math.round(hakiVolume * 100)}%
-        </span>
-      </div>
     </div>
   )
 }
@@ -432,7 +409,7 @@ const ActionPanel = ({
 const DraftScreen = ({
   universe, p1, p2, draft, onFinish, mode,
   onGacha, onAssign, onSkip, onUndo, onSwitch, imgUrl,
-  onMenu, onPlayers, onPass, version,
+  onMenu, onPlayers, onPass, version, volume,
 }) => {
   const positions = universe.positions
 
@@ -445,10 +422,6 @@ const DraftScreen = ({
   const [reelChars, setReelChars] = useState([])
 
   const [hakiActive, setHakiActive] = useState(false)
-  const [hakiVolume, setHakiVolume] = useState(
-    () => parseFloat(localStorage.getItem("hakiVolume") ?? "0.9")
-  )
-  useEffect(() => { localStorage.setItem("hakiVolume", hakiVolume) }, [hakiVolume])
 
   const prevSpinning = useRef(false)
   useEffect(() => {
@@ -598,12 +571,10 @@ const DraftScreen = ({
         onPlayers={onPlayers}
         onPass={handlePass}
         switchActive={switchMode}
-        hakiVolume={hakiVolume}
-        setHakiVolume={setHakiVolume}
       />
 
       {/* Haki cinematic overlay */}
-      {hakiActive && <HakiOverlay volume={hakiVolume} onComplete={() => setHakiActive(false)} />}
+      {hakiActive && <HakiOverlay volume={volume} onComplete={() => setHakiActive(false)} />}
     </div>
   )
 }

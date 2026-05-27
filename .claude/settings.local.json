@@ -28,7 +28,11 @@
       "PowerShell(Head -20)",
       "PowerShell(Get-ChildItem -Path \"c:\\\\Users\\\\willi\\\\Downloads\\\\Showdown\" -Force -Depth 1 | Where-Object { $_.Name -notmatch \"node_modules|__pycache__|\\\\.git\" } | Select-Object Name, @{Name='Type'; Expression={if \\($_.PSIsContainer\\) {'Dir'} else {'File'}}} | Format-Table)",
       "PowerShell(& \"C:\\\\Program Files\\\\Git\\\\bin\\\\git.exe\" -C \"c:\\\\Users\\\\willi\\\\Downloads\\\\Showdown\" tag -l; Write-Host \"---DIST---\"; Get-ChildItem \"c:\\\\Users\\\\willi\\\\Downloads\\\\Showdown\\\\dist\" -ErrorAction SilentlyContinue | Select-Object Name, @{N=\"MB\";E={[math]::Round\\($_.Length/1MB,1\\)}})",
-      "PowerShell(New-Item -ItemType Directory -Force \"c:\\\\Users\\\\willi\\\\Downloads\\\\Showdown\\\\.github\\\\workflows\")"
+      "PowerShell(New-Item -ItemType Directory -Force \"c:\\\\Users\\\\willi\\\\Downloads\\\\Showdown\\\\.github\\\\workflows\")",
+      "Bash(gh release *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
     ]
   }
 }
