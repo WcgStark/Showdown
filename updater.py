@@ -8,7 +8,7 @@ import tempfile
 import threading
 import urllib.request
 
-APP_VERSION = "1.1.3"
+APP_VERSION = "1.1.4"
 # ─── Configure your GitHub repo here ─────────────────────────────────────────
 GITHUB_OWNER = "WcgStark"   # ← substituir pelo seu usuário do GitHub
 GITHUB_REPO  = "Showdown"      # ← substituir pelo nome do repositório
@@ -167,22 +167,33 @@ def apply_update() -> bool:
     with open(ps_path, "w", encoding="utf-8") as f:
         f.write(ps)
 
+    # ShellExecuteW launches via the Windows Shell — the spawned process is NOT
+    # placed in the calling process's Job Object, bypassing PyInstaller's job limit.
+    import ctypes
+    ps_args = f'-ExecutionPolicy Bypass -WindowStyle Hidden -File "{ps_path}"'
     try:
         with open(log_path, "a", encoding="utf-8") as f:
-            f.write(f"[py] ps1 written, launching powershell\n")
-        subprocess.Popen(
-            [_POWERSHELL, "-ExecutionPolicy", "Bypass", "-WindowStyle", "Hidden", "-File", ps_path],
-            creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP | _CREATE_BREAKAWAY_FROM_JOB,
-            close_fds=True,
-            stdin=subprocess.DEVNULL,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
+            f.write(f"[py] launching via ShellExecuteW\n")
+        ret = ctypes.windll.shell32.ShellExecuteW(None, "open", _POWERSHELL, ps_args, None, 0)
         with open(log_path, "a", encoding="utf-8") as f:
-            f.write(f"[py] Popen returned OK\n")
+            f.write(f"[py] ShellExecuteW returned {ret}\n")
+        if ret <= 32:
+            raise RuntimeError(f"ShellExecuteW error code {ret}")
     except Exception as e:
         with open(log_path, "a", encoding="utf-8") as f:
-            f.write(f"[py] Popen FAILED: {e}\n")
-        return False
+            f.write(f"[py] ShellExecuteW FAILED ({e}), falling back to Popen\n")
+        try:
+            subprocess.Popen(
+                [_POWERSHELL, "-ExecutionPolicy", "Bypass", "-WindowStyle", "Hidden", "-File", ps_path],
+                creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP | _CREATE_BREAKAWAY_FROM_JOB,
+                close_fds=True,
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+        except Exception as e2:
+            with open(log_path, "a", encoding="utf-8") as f:
+                f.write(f"[py] Popen fallback FAILED: {e2}\n")
+            return False
 
     return True
