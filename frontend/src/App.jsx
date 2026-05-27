@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { setUiVolume } from './sounds'
 import LobbyScreen from './screens/LobbyScreen'
 import PlayersScreen from './screens/PlayersScreen'
 import DraftScreen from './screens/DraftScreen'
@@ -38,7 +39,10 @@ const App = () => {
   const [volume, setVolume] = useState(
     () => parseFloat(localStorage.getItem("hakiVolume") ?? "0.9")
   )
-  useEffect(() => { localStorage.setItem("hakiVolume", volume) }, [volume])
+  useEffect(() => {
+    localStorage.setItem("hakiVolume", volume)
+    setUiVolume(volume)
+  }, [volume])
 
   const [quality, setQuality] = useState(
     () => localStorage.getItem("hakiQuality") ?? "rtx"

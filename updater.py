@@ -8,7 +8,7 @@ import tempfile
 import threading
 import urllib.request
 
-APP_VERSION = "1.0.8"
+APP_VERSION = "1.0.9"
 # ─── Configure your GitHub repo here ─────────────────────────────────────────
 GITHUB_OWNER = "WcgStark"   # ← substituir pelo seu usuário do GitHub
 GITHUB_REPO  = "Showdown"      # ← substituir pelo nome do repositório
