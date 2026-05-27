@@ -8,7 +8,7 @@ import tempfile
 import threading
 import urllib.request
 
-APP_VERSION = "1.1.7"
+APP_VERSION = "1.1.8"
 # ─── Configure your GitHub repo here ─────────────────────────────────────────
 GITHUB_OWNER = "WcgStark"   # ← substituir pelo seu usuário do GitHub
 GITHUB_REPO  = "Showdown"      # ← substituir pelo nome do repositório
@@ -152,9 +152,15 @@ def apply_update() -> bool:
         '}\n'
         'if ($ok) { "[ps] copy succeeded" | Out-File $log -Append } else { "[ps] copy FAILED" | Out-File $log -Append; exit 1 }\n'
         'Remove-Item $src -Force -ErrorAction SilentlyContinue\n'
+        # Let the freshly-written exe settle: Defender real-time scan can briefly lock
+        # the file, which makes the onefile bootloader fail to extract python3xx.dll.
+        'Start-Sleep -Milliseconds 4000\n'
+        '"[ps] settle done, launching" | Out-File $log -Append\n'
         # Launch updated exe
         'try { Start-Process -FilePath $dst; "[ps] launch succeeded" | Out-File $log -Append }\n'
         'catch { "[ps] launch failed: $_" | Out-File $log -Append }\n'
+        # Keep PowerShell alive while the new exe finishes extracting its _MEI bundle.
+        'Start-Sleep -Milliseconds 3000\n'
         'Remove-Item $PSCommandPath -Force -ErrorAction SilentlyContinue\n'
     )
 
