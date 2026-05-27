@@ -8,7 +8,7 @@ import tempfile
 import threading
 import urllib.request
 
-APP_VERSION = "1.0.5"
+APP_VERSION = "1.0.6"
 # ─── Configure your GitHub repo here ─────────────────────────────────────────
 GITHUB_OWNER = "WcgStark"   # ← substituir pelo seu usuário do GitHub
 GITHUB_REPO  = "Showdown"      # ← substituir pelo nome do repositório
@@ -116,22 +116,33 @@ def apply_update() -> bool:
     current_exe = sys.executable
     pid = os.getpid()
     mei_path = getattr(sys, "_MEIPASS", "")
+    log_path = os.path.join(tempfile.gettempdir(), "showdown_update.log")
 
     ps = (
-        f'$pid = {pid}\n'
+        f'$appPid = {pid}\n'
         f'$src = "{tmp_path}"\n'
         f'$dst = "{current_exe}"\n'
         f'$mei = "{mei_path}"\n'
-        # Wait until this process is fully gone
-        'while (Get-Process -Id $pid -ErrorAction SilentlyContinue) { Start-Sleep -Milliseconds 300 }\n'
-        'Start-Sleep -Milliseconds 800\n'
+        f'$log = "{log_path}"\n'
+        '"[update] script started" | Out-File $log -Encoding utf8\n'
+        # Wait until this process is fully gone ($PID is reserved — use $appPid)
+        'while (Get-Process -Id $appPid -ErrorAction SilentlyContinue) { Start-Sleep -Milliseconds 300 }\n'
+        '"[update] process exited" | Out-File $log -Append\n'
+        'Start-Sleep -Milliseconds 2000\n'
         # Clean up old MEI temp dir so the new exe starts fresh
         'if ($mei -and (Test-Path $mei)) { Remove-Item $mei -Recurse -Force -ErrorAction SilentlyContinue }\n'
-        # Copy new exe
-        'Copy-Item -Path $src -Destination $dst -Force\n'
+        '"[update] MEI cleaned" | Out-File $log -Append\n'
+        # Copy new exe (retry up to 5x in case file is briefly locked)
+        '$ok = $false\n'
+        'for ($i = 0; $i -lt 5; $i++) {\n'
+        '  try { Copy-Item -Path $src -Destination $dst -Force -ErrorAction Stop; $ok = $true; break }\n'
+        '  catch { "[update] copy attempt $i failed: $_" | Out-File $log -Append; Start-Sleep -Milliseconds 600 }\n'
+        '}\n'
+        'if ($ok) { "[update] copy succeeded" | Out-File $log -Append } else { "[update] copy FAILED after retries" | Out-File $log -Append; exit 1 }\n'
         'Remove-Item $src -Force -ErrorAction SilentlyContinue\n'
         # Launch updated exe
-        'Start-Process $dst\n'
+        'try { Start-Process -FilePath $dst; "[update] launch succeeded" | Out-File $log -Append }\n'
+        'catch { "[update] launch failed: $_" | Out-File $log -Append }\n'
         # Delete this script
         'Remove-Item $PSCommandPath -Force -ErrorAction SilentlyContinue\n'
     )

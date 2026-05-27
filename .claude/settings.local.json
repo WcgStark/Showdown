@@ -32,7 +32,11 @@
       "Bash(gh release *)",
       "Bash(git add *)",
       "Bash(git commit *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(git rm *)",
+      "Bash(python _set_version.py 1.0.6)",
+      "Bash(python -c \"import re; c=open\\('updater.py'\\).read\\(\\); print\\(re.search\\(r'APP_VERSION = \\\\\"[^\\\\\"]+\\\\\"', c\\).group\\(\\)\\)\")",
+      "Bash(.\\\\release.bat 1.0.6)"
     ]
   }
 }
