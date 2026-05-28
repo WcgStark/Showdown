@@ -43,7 +43,7 @@ echo [4/4] Publicando no GitHub...
 %GIT% add frontend\src api *.py *.bat *.spec
 %GIT% commit -m "release v%VERSION%"
 %GIT% push
-gh release create v%VERSION% "dist\Showdown Draft.exe" --title "Versao %VERSION%" --notes ""
+gh release create v%VERSION% "dist\ShowdownDraft.exe" --title "Versao %VERSION%" --notes ""
 if errorlevel 1 ( echo ERRO ao publicar no GitHub! & pause & exit /b 1 )
 
 echo.

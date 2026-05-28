@@ -34,7 +34,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='Showdown Draft',
+    name='ShowdownDraft',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
