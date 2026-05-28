@@ -454,7 +454,7 @@ _JOJO_CHARACTERS = [
     "Joseph Joestar", "Caesar Zeppeli", "Lisa Lisa", "Smokey Brown",
     "Rudol von Stroheim", "Kars", "Esidisi", "Wamuu", "Santana",
     # Parte 3 — Stardust Crusaders
-    "Jotaro Kujo", "Avdol", "Kakyoin", "Polnareff", "Iggy", "DIO",
+    "Jotaro Kujo", "Avdol", "Kakyoin", "Polnareff", "Iggy",
     "Hol Horse", "J. Geil", "Vanilla Ice", "Enya", "N'Doul",
     "Daniel J. D'Arby", "Telence D'Arby",
     # Parte 4 — Diamond is Unbreakable

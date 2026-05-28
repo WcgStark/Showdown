@@ -1,11 +1,23 @@
-let _vol = 0.9
+// Two independent audio channels — UI clicks vs SFX (haki, future per-universe
+// effects). Each volume is a module-level value updated from App via setters,
+// and exposed via getters so components mount-time captures still see live
+// updates (since the value is read at play() time).
 
-export const setUiVolume = (v) => { _vol = v }
+let _uiVol  = 0.9
+let _sfxVol = 0.9
+
+export const setUiVolume  = (v) => { _uiVol  = v }
+export const setSfxVolume = (v) => { _sfxVol = v }
+
+export const getUiVolume  = () => _uiVol
+export const getSfxVolume = () => _sfxVol
+
+const clamp = (v) => Math.max(0, Math.min(1, v))
 
 export const playUi = () => {
   try {
     const a = new Audio('./sounds/ui%20sound.mp3')
-    a.volume = Math.max(0, Math.min(1, _vol))
+    a.volume = clamp(_uiVol)
     a.play().catch(() => {})
   } catch {}
 }

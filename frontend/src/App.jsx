@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { setUiVolume } from './sounds'
+import { setUiVolume, setSfxVolume } from './sounds'
 import { loadKeybinds } from './keybinds'
 import LobbyScreen from './screens/LobbyScreen'
 import PlayersScreen from './screens/PlayersScreen'
@@ -38,13 +38,23 @@ const App = () => {
   const [updateProgress, setUpdateProgress] = useState(0)
   const [updateDismissed, setUpdateDismissed] = useState(false)
 
-  const [volume, setVolume] = useState(
-    () => parseFloat(localStorage.getItem("hakiVolume") ?? "0.9")
+  // Two independent channels. Migrate from the old single "hakiVolume" key
+  // when the new ones aren't set yet so existing users keep their level.
+  const _legacyVol = localStorage.getItem("hakiVolume")
+  const [uiVolume, setUiVol] = useState(
+    () => parseFloat(localStorage.getItem("hakiUiVolume") ?? _legacyVol ?? "0.9")
+  )
+  const [sfxVolume, setSfxVol] = useState(
+    () => parseFloat(localStorage.getItem("hakiSfxVolume") ?? _legacyVol ?? "0.9")
   )
   useEffect(() => {
-    localStorage.setItem("hakiVolume", volume)
-    setUiVolume(volume)
-  }, [volume])
+    localStorage.setItem("hakiUiVolume", uiVolume)
+    setUiVolume(uiVolume)
+  }, [uiVolume])
+  useEffect(() => {
+    localStorage.setItem("hakiSfxVolume", sfxVolume)
+    setSfxVolume(sfxVolume)
+  }, [sfxVolume])
 
   const [quality, setQuality] = useState(
     () => localStorage.getItem("hakiQuality") ?? "rtx"
@@ -239,8 +249,10 @@ const App = () => {
             selectedId={selectedId}
             setSelectedId={setSelectedId}
             version={config.version}
-            volume={volume}
-            onVolumeChange={setVolume}
+            uiVolume={uiVolume}
+            onUiVolumeChange={setUiVol}
+            sfxVolume={sfxVolume}
+            onSfxVolumeChange={setSfxVol}
             quality={quality}
             onQualityChange={setQuality}
             lang={lang}
@@ -286,9 +298,11 @@ const App = () => {
             onPlayers={() => setScreen("players")}
             onPass={handlePass}
             version={config.version}
-            volume={volume}
+            uiVolume={uiVolume}
+            sfxVolume={sfxVolume}
             lang={lang}
-            onVolumeChange={setVolume}
+            onUiVolumeChange={setUiVol}
+            onSfxVolumeChange={setSfxVol}
             quality={quality}
             onQualityChange={setQuality}
             onLangChange={setLang}

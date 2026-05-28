@@ -76,7 +76,7 @@ export const AppBar = ({ phase = "LOBBY", universe, mode, step, version, lang = 
       <div className="mark" />
       <span>SHOWDOWN</span>
       <span style={{ color: "var(--ink-3)", letterSpacing: "0.18em", fontWeight: 500, fontSize: 11, marginLeft: 6 }}>
-        / Draft v.{version || "?"}
+        / Draft v{version || "?"}
       </span>
     </div>
     <div className="meta">
@@ -100,7 +100,26 @@ export const ImgPh = ({ label = "PORTRAIT", aspect = "3 / 4", style }) => (
 )
 
 /* ============ Settings modal (shared) ============ */
-export const SettingsModal = ({ volume, onVolumeChange, quality, onQualityChange, lang, onLangChange, keybinds, onKeybindsChange, onClose }) => {
+const VolumeSlider = ({ label, value, onChange }) => (
+  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <span style={{ fontFamily: "var(--f-mono)", fontSize: 10, color: "var(--ink-2)", letterSpacing: "0.18em" }}>
+        {label}
+      </span>
+      <span style={{ fontFamily: "var(--f-mono)", fontSize: 12, color: "var(--ink-0)", letterSpacing: "0.08em", minWidth: 40, textAlign: "right" }}>
+        {Math.round(value * 100)}%
+      </span>
+    </div>
+    <input
+      type="range" min="0" max="1" step="0.05"
+      value={value}
+      onChange={e => onChange(parseFloat(e.target.value))}
+      style={{ width: "100%", accentColor: "var(--acc)", cursor: "pointer", height: 4 }}
+    />
+  </div>
+)
+
+export const SettingsModal = ({ uiVolume, onUiVolumeChange, sfxVolume, onSfxVolumeChange, quality, onQualityChange, lang, onLangChange, keybinds, onKeybindsChange, onClose }) => {
   const [listening, setListening] = useState(null)
 
   // Capture the next key press to rebind the action being listened for.
@@ -159,35 +178,20 @@ export const SettingsModal = ({ volume, onVolumeChange, quality, onQualityChange
         >×</button>
       </div>
 
-      {/* Volume */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="square" style={{ color: "var(--ink-2)" }}>
-              <path d="M11 5L6 9H2v6h4l5 4V5z"/>
-              <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
-              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-            </svg>
-            <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-2)", letterSpacing: "0.16em" }}>
-              {t('audioVolume', lang)}
-            </span>
-          </div>
-          <span style={{ fontFamily: "var(--f-mono)", fontSize: 13, color: "var(--ink-0)", letterSpacing: "0.08em", minWidth: 40, textAlign: "right" }}>
-            {Math.round(volume * 100)}%
+      {/* Audio — UI and SFX channels */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="square" style={{ color: "var(--ink-2)" }}>
+            <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+          <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-2)", letterSpacing: "0.16em" }}>
+            {t('audioVolume', lang)}
           </span>
         </div>
-
-        <input
-          type="range" min="0" max="1" step="0.05"
-          value={volume}
-          onChange={e => onVolumeChange(parseFloat(e.target.value))}
-          style={{ width: "100%", accentColor: "var(--acc)", cursor: "pointer", height: 4 }}
-        />
-
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span style={{ fontFamily: "var(--f-mono)", fontSize: 9, color: "var(--ink-4)", letterSpacing: "0.12em" }}>{t('mute', lang)}</span>
-          <span style={{ fontFamily: "var(--f-mono)", fontSize: 9, color: "var(--ink-4)", letterSpacing: "0.12em" }}>{t('max', lang)}</span>
-        </div>
+        <VolumeSlider label={t('uiVolume', lang)}  value={uiVolume}  onChange={onUiVolumeChange} />
+        <VolumeSlider label={t('sfxVolume', lang)} value={sfxVolume} onChange={onSfxVolumeChange} />
       </div>
 
       {/* Divider */}

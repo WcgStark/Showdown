@@ -65,7 +65,7 @@ const UniverseCard = ({ universe, active, onHover, onClick }) => {
   )
 }
 
-const LobbyScreen =({ universes, onSelect, selectedId, setSelectedId, version, volume, onVolumeChange, quality, onQualityChange, lang, onLangChange, keybinds, onKeybindsChange }) => {
+const LobbyScreen =({ universes, onSelect, selectedId, setSelectedId, version, uiVolume, onUiVolumeChange, sfxVolume, onSfxVolumeChange, quality, onQualityChange, lang, onLangChange, keybinds, onKeybindsChange }) => {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const sel = universes.find(u => u.id === selectedId) || universes[0]
 
@@ -149,8 +149,10 @@ const LobbyScreen =({ universes, onSelect, selectedId, setSelectedId, version, v
 
       {settingsOpen && (
         <SettingsModal
-          volume={volume}
-          onVolumeChange={onVolumeChange}
+          uiVolume={uiVolume}
+          onUiVolumeChange={onUiVolumeChange}
+          sfxVolume={sfxVolume}
+          onSfxVolumeChange={onSfxVolumeChange}
           quality={quality}
           onQualityChange={onQualityChange}
           lang={lang}

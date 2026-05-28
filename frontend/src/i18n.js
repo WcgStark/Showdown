@@ -17,7 +17,9 @@ const T = {
     confirmSelection: "CONFIRM SELECTION",
     // Settings modal
     configuration:    "CONFIGURATION",
-    audioVolume:      "AUDIO VOLUME",
+    audioVolume:      "AUDIO",
+    uiVolume:         "UI",
+    sfxVolume:        "SFX",
     mute:             "MUTE",
     max:              "MAX",
     quality:          "QUALITY",
@@ -99,7 +101,9 @@ const T = {
     confirmSelection: "CONFIRMAR SELEÇÃO",
     // Settings modal
     configuration:    "CONFIGURAÇÃO",
-    audioVolume:      "VOLUME DE ÁUDIO",
+    audioVolume:      "ÁUDIO",
+    uiVolume:         "UI",
+    sfxVolume:        "SFX",
     mute:             "MUDO",
     max:              "MÁX",
     quality:          "QUALIDADE",

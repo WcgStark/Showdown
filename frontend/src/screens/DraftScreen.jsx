@@ -8,12 +8,12 @@ import { codeLabel } from '../keybinds'
 const HAKI_OX = 1666 // 1920 - 64 - 380/2
 const HAKI_OY = 272  // panel top 80 + padding 18 + label ~20 + marginTop 14 + portrait 280/2
 
-const HakiOverlay = ({ onComplete, volume = 0.9 }) => {
+const HakiOverlay = ({ onComplete, sfxVolume = 0.9 }) => {
   useEffect(() => {
     const audio = new Audio(
       "./sounds/Monkey%20D%20Luffy%20Haki%20Sound%20%20One%20Piece.mp3"
     )
-    audio.volume = volume
+    audio.volume = Math.max(0, Math.min(1, sfxVolume))
     audio.play().catch(() => {})
     const t = setTimeout(onComplete, 3600)
     return () => clearTimeout(t)
@@ -26,21 +26,11 @@ const HakiOverlay = ({ onComplete, volume = 0.9 }) => {
   return (
     <div style={{ position: "absolute", inset: 0, zIndex: 100, pointerEvents: "none", overflow: "hidden" }}>
 
-      {/* Full-screen black — subtle dark-red only at portrait origin */}
+      {/* Backdrop darkens the screen but stays transparent over the portrait */}
       <div style={{
         position: "absolute", inset: 0,
-        background: `radial-gradient(ellipse 38% 48% at ${pctX}% ${pctY}%, rgba(18,0,0,0.38) 0%, rgba(0,0,0,0.97) 100%)`,
+        background: `radial-gradient(ellipse 42% 52% at ${pctX}% ${pctY}%, transparent 0%, transparent 28%, rgba(0,0,0,0.92) 80%, rgba(0,0,0,0.97) 100%)`,
         animation: "hakiFlash 3.6s ease-out forwards",
-      }} />
-
-      {/* Black sphere expanding from portrait — keeps center dark */}
-      <div style={{
-        position: "absolute", left: ox, top: oy,
-        width: 340, height: 340, borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(0,0,0,1) 30%, rgba(12,0,0,0.75) 62%, transparent 100%)",
-        filter: "blur(16px)",
-        transform: "translate(-50%, -50%) scale(0)", opacity: 0,
-        animation: "hakiCenter 3.6s ease-out forwards",
       }} />
 
       {/* Three red rings expanding from portrait */}
@@ -414,8 +404,8 @@ const ActionPanel = ({
 const DraftScreen = ({
   universe, p1, p2, draft, onFinish, mode,
   onGacha, onAssign, onSkip, onUndo, onSwitch, imgUrl,
-  onMenu, onPlayers, onPass, version, volume, lang,
-  onVolumeChange, quality, onQualityChange, onLangChange,
+  onMenu, onPlayers, onPass, version, uiVolume, sfxVolume, lang,
+  onUiVolumeChange, onSfxVolumeChange, quality, onQualityChange, onLangChange,
   keybinds, onKeybindsChange,
 }) => {
   const positions = universe.positions
@@ -621,8 +611,10 @@ const DraftScreen = ({
 
       {settingsOpen && (
         <SettingsModal
-          volume={volume}
-          onVolumeChange={onVolumeChange}
+          uiVolume={uiVolume}
+          onUiVolumeChange={onUiVolumeChange}
+          sfxVolume={sfxVolume}
+          onSfxVolumeChange={onSfxVolumeChange}
           quality={quality}
           onQualityChange={onQualityChange}
           lang={lang}
@@ -634,7 +626,7 @@ const DraftScreen = ({
       )}
 
       {/* Haki cinematic overlay */}
-      {hakiActive && <HakiOverlay volume={volume} onComplete={() => setHakiActive(false)} />}
+      {hakiActive && <HakiOverlay sfxVolume={sfxVolume} onComplete={() => setHakiActive(false)} />}
     </div>
   )
 }
