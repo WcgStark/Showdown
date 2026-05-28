@@ -21,6 +21,7 @@
   --u-naruto:     oklch(0.78 0.16 75);   /* amber */
   --u-bleach:     oklch(0.78 0.14 220);  /* cyan */
   --u-invincible: oklch(0.82 0.18 95);   /* electric yellow */
+  --u-jojo:       oklch(0.70 0.18 320);  /* magenta-purple */
 
   /* Current accent (overridden per scope) */
   --acc: var(--u-onepiece);
@@ -48,6 +49,7 @@
 .acc-naruto     { --acc: var(--u-naruto);     --acc-soft: color-mix(in oklab, var(--u-naruto) 18%, transparent);     --acc-line: color-mix(in oklab, var(--u-naruto) 45%, transparent); }
 .acc-bleach     { --acc: var(--u-bleach);     --acc-soft: color-mix(in oklab, var(--u-bleach) 18%, transparent);     --acc-line: color-mix(in oklab, var(--u-bleach) 45%, transparent); }
 .acc-invincible { --acc: var(--u-invincible); --acc-soft: color-mix(in oklab, var(--u-invincible) 18%, transparent); --acc-line: color-mix(in oklab, var(--u-invincible) 45%, transparent); }
+.acc-jojo       { --acc: var(--u-jojo);       --acc-soft: color-mix(in oklab, var(--u-jojo) 18%, transparent);       --acc-line: color-mix(in oklab, var(--u-jojo) 45%, transparent); }
 
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; background: var(--bg-0); color: var(--ink-0); font-family: var(--f-body); }

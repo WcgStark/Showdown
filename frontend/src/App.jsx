@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { setUiVolume } from './sounds'
+import { loadKeybinds } from './keybinds'
 import LobbyScreen from './screens/LobbyScreen'
 import PlayersScreen from './screens/PlayersScreen'
 import DraftScreen from './screens/DraftScreen'
@@ -10,6 +11,7 @@ const UNIVERSE_UI = {
   naruto:     { codename: "HIDDEN LEAF" },
   bleach:     { codename: "GOTEI" },
   invincible: { codename: "VILTRUM" },
+  jojo:       { codename: "STARDUST" },
 }
 
 const enrichUniverse = u => ({
@@ -53,6 +55,9 @@ const App = () => {
     () => localStorage.getItem("hakiLang") ?? "en"
   )
   useEffect(() => { localStorage.setItem("hakiLang", lang) }, [lang])
+
+  const [keybinds, setKeybinds] = useState(loadKeybinds)
+  useEffect(() => { localStorage.setItem("hakiKeybinds", JSON.stringify(keybinds)) }, [keybinds])
 
   // ── Responsive layout: scale + center the 1920×1080 stage ────────────────
   useEffect(() => {
@@ -240,6 +245,8 @@ const App = () => {
             onQualityChange={setQuality}
             lang={lang}
             onLangChange={setLang}
+            keybinds={keybinds}
+            onKeybindsChange={setKeybinds}
           />
         )}
 
@@ -257,6 +264,7 @@ const App = () => {
             quickNames={config.quickNames}
             version={config.version}
             lang={lang}
+            keybinds={keybinds}
           />
         )}
 
@@ -284,6 +292,8 @@ const App = () => {
             quality={quality}
             onQualityChange={setQuality}
             onLangChange={setLang}
+            keybinds={keybinds}
+            onKeybindsChange={setKeybinds}
           />
         )}
 

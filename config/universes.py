@@ -110,6 +110,24 @@ def _build_naruto_theme() -> Theme:
     )
 
 
+def _build_jojo_theme() -> Theme:
+    return Theme(
+        bg="#150A1F",
+        panel_bg="#22103A",
+        border="#C77DFF",
+        title_fg="#C77DFF",
+        text_fg="#E9D5FF",
+        text_secondary="#B89BD9",
+        button_start_bg="#9D4EDD",
+        button_start_fg="white",
+        font_family="Arial",
+        icon="⭐",
+        entry_bg="#1C0E30",
+        entry_fg="#E9D5FF",
+        entry_insert="#C77DFF",
+    )
+
+
 def _build_bleach_theme() -> Theme:
     return Theme(
         bg="#0A0A14",
@@ -424,6 +442,54 @@ BLEACH = Universe(
 
 
 # ──────────────────────────────────────────────
+# JoJo's Bizarre Adventure (Partes 1-6)
+# ──────────────────────────────────────────────
+
+_JOJO_CHARACTERS = [
+    # Parte 1 — Phantom Blood
+    "Jonathan Joestar", "Dio Brando", "Will A. Zeppeli",
+    "Robert E. O. Speedwagon", "Poco", "Dire", "Straizo",
+    "Tarkus", "Bruford", "Wang Chan",
+    # Parte 2 — Battle Tendency
+    "Joseph Joestar", "Caesar Zeppeli", "Lisa Lisa", "Smokey Brown",
+    "Rudol von Stroheim", "Kars", "Esidisi", "Wamuu", "Santana",
+    # Parte 3 — Stardust Crusaders
+    "Jotaro Kujo", "Avdol", "Kakyoin", "Polnareff", "Iggy", "DIO",
+    "Hol Horse", "J. Geil", "Vanilla Ice", "Enya", "N'Doul",
+    "Daniel J. D'Arby", "Telence D'Arby",
+    # Parte 4 — Diamond is Unbreakable
+    "Josuke", "Koichi", "Okuyasu", "Rohan", "Kira",
+    "Yukako", "Shigechi", "Akira", "Angelo",
+    # Parte 5 — Golden Wind
+    "Giorno", "Bucciarati", "Mista", "Narancia", "Abbacchio", "Fugo",
+    "Diavolo", "Risotto", "Prosciutto", "Pesci", "Ghiaccio",
+    "Cioccolata", "Secco",
+    # Parte 6 — Stone Ocean
+    "Jolyne", "Hermes", "Anasui", "Weather Report", "Foo Fighters",
+    "Pucci", "Johngalli A", "Gwess", "Lang Rangler", "Sports Maxx",
+    "Rikiel", "Versus",
+]
+
+JOJO = Universe(
+    key="jojo",
+    name="JoJo",
+    api_url="https://jojo.fandom.com/api.php",
+    asset_folder="assets/jojo",
+    characters=_JOJO_CHARACTERS,
+    positions=POSITIONS_STANDARD,
+    theme=_build_jojo_theme(),
+    default_filter="completo",
+    filters={
+        "completo": FilterSet(
+            label="⭐  Completo  (Partes 1-6)",
+            description="Todos os personagens das partes 1 a 6.",
+            exclude=set(),
+        ),
+    },
+)
+
+
+# ──────────────────────────────────────────────
 # Registry — single source of truth
 # ──────────────────────────────────────────────
 
@@ -432,4 +498,5 @@ ALL_UNIVERSES: dict[str, Universe] = {
     "invincible": INVINCIBLE,
     "naruto":     NARUTO,
     "bleach":     BLEACH,
+    "jojo":       JOJO,
 }

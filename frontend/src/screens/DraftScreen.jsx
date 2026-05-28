@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Atmos, AppBar, Icon, CornerTicks, SettingsModal } from '../components'
 import { t } from '../i18n'
+import { codeLabel } from '../keybinds'
 
 /* ── Haki effect ─────────────────────────────────────────────────── */
 // Portrait center inside the ActionPanel (right: 64, width: 380) at 1920×1080
@@ -122,7 +123,7 @@ const PlayerBanner = ({ side, player, filled, total, active, skips, lang }) => {
       </div>
 
       <div style={{ textAlign: isLeft ? "right" : "left", display: "flex", flexDirection: "column", gap: 2 }}>
-        <span style={{ color: "var(--ink-3)", fontFamily: "var(--f-mono)", fontSize: 10, letterSpacing: "0.18em" }}>SKIPS</span>
+        <span style={{ color: "var(--ink-3)", fontFamily: "var(--f-mono)", fontSize: 10, letterSpacing: "0.18em" }}>{t('skipsWord', lang)}</span>
         <span className="display" style={{ fontSize: 32, color: "var(--ink-0)" }}>
           {skips}<span style={{ color: "var(--ink-3)", fontSize: 18 }}>/1</span>
         </span>
@@ -261,7 +262,7 @@ const ActionBtn = ({ icon, label, hint, onClick, disabled, primary, fullWidth })
 /* ----- Right action panel ----- */
 const ActionPanel = ({
   universe, draft, spinning, reelChars, onSpin, onSkip, onUndo, onSwitch, onReady,
-  ready, imgUrl, onMenu, onPlayers, onPass, onSettings, switchActive, lang,
+  ready, imgUrl, onMenu, onPlayers, onPass, onSettings, switchActive, lang, keybinds,
 }) => {
   const turnLabel = draft.turn === "p1" ? "PLAYER 01" : "PLAYER 02"
   const skipsLeft = draft.turn === "p1" ? draft.skipsP1 : draft.skipsP2
@@ -369,15 +370,15 @@ const ActionPanel = ({
 
       {/* Action buttons */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-        <ActionBtn icon="dice" label={t('gacha', lang)} hint="SPACE" primary
+        <ActionBtn icon="dice" label={t('gacha', lang)} hint={codeLabel(keybinds.gacha)} primary
           onClick={onSpin} disabled={!!draft.currentChar || spinning || switchActive} fullWidth />
-        <ActionBtn icon="skip" label={t('skip', lang)} hint="S"
+        <ActionBtn icon="skip" label={t('skip', lang)} hint={codeLabel(keybinds.skip)}
           onClick={onSkip} disabled={!draft.currentChar || skipsLeft <= 0} />
-        <ActionBtn icon="arrow" label={t('pass', lang)} hint="P"
+        <ActionBtn icon="arrow" label={t('pass', lang)} hint={codeLabel(keybinds.pass)}
           onClick={onPass} disabled={!!draft.currentChar || switchActive} />
-        <ActionBtn icon="swap" label={t('switch', lang)} hint="W"
+        <ActionBtn icon="swap" label={t('switch', lang)} hint={codeLabel(keybinds.switch)}
           onClick={onSwitch} disabled={!!draft.currentChar || switchActive || myFilled < 2} />
-        <ActionBtn icon="undo" label={t('undo', lang)} hint="Z"
+        <ActionBtn icon="undo" label={t('undo', lang)} hint={codeLabel(keybinds.undo)}
           onClick={onUndo} disabled={!draft.undoAvailable} />
       </div>
 
@@ -388,7 +389,7 @@ const ActionPanel = ({
         style={{ height: 64, fontSize: 16 }}
       >
         <Icon name="check" size={18} /> {t('readyLock', lang)}
-        <span className="kbd">ENTER</span>
+        <span className="kbd">{codeLabel(keybinds.confirm)}</span>
       </button>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
@@ -415,6 +416,7 @@ const DraftScreen = ({
   onGacha, onAssign, onSkip, onUndo, onSwitch, imgUrl,
   onMenu, onPlayers, onPass, version, volume, lang,
   onVolumeChange, quality, onQualityChange, onLangChange,
+  keybinds, onKeybindsChange,
 }) => {
   const positions = universe.positions
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -497,10 +499,44 @@ const DraftScreen = ({
     await onPass()
   }
 
+  // ── Keyboard controls (respect the same enable rules as the buttons) ──────
+  useEffect(() => {
+    const onKey = e => {
+      if (e.repeat) return
+      const skipsLeft = draft.turn === "p1" ? draft.skipsP1 : draft.skipsP2
+      const myFilled  = draft.turn === "p1" ? filledP1 : filledP2
+
+      // Back / Escape: close settings, else cancel an active switch
+      if (e.code === keybinds.back) {
+        if (settingsOpen) { e.preventDefault(); setSettingsOpen(false) }
+        else if (switchMode) { e.preventDefault(); setSwitchMode(false); setSwitchFirst(null) }
+        return
+      }
+      // While settings is open, don't trigger game actions
+      if (settingsOpen) return
+
+      if (e.code === keybinds.gacha) {
+        if (!draft.currentChar && !spinning && !switchMode) { e.preventDefault(); spin() }
+      } else if (e.code === keybinds.skip) {
+        if (draft.currentChar && skipsLeft > 0) { e.preventDefault(); onSkip() }
+      } else if (e.code === keybinds.pass) {
+        if (!draft.currentChar && !switchMode) { e.preventDefault(); handlePass() }
+      } else if (e.code === keybinds.switch) {
+        if (!draft.currentChar && !switchMode && myFilled >= 2) { e.preventDefault(); handleSwitch() }
+      } else if (e.code === keybinds.undo) {
+        if (draft.undoAvailable) { e.preventDefault(); onUndo() }
+      } else if (e.code === keybinds.confirm) {
+        if (allDone) { e.preventDefault(); onFinish() }
+      }
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [keybinds, draft, spinning, switchMode, settingsOpen, filledP1, filledP2, allDone])
+
   return (
     <div className={`stage acc-${universe.id}`} data-screen-label="03 Draft">
       <Atmos particles={false} grid={true} />
-      <AppBar phase="DRAFTING" universe={universe} mode={mode} step={`${totalPicks} / ${positions.length * 2}`} version={version} />
+      <AppBar phase="DRAFTING" universe={universe} mode={mode} step={`${totalPicks} / ${positions.length * 2}`} version={version} lang={lang} />
 
       {switchMode && (
         <div style={{
@@ -580,6 +616,7 @@ const DraftScreen = ({
         onSettings={() => setSettingsOpen(true)}
         switchActive={switchMode}
         lang={lang}
+        keybinds={keybinds}
       />
 
       {settingsOpen && (
@@ -590,6 +627,8 @@ const DraftScreen = ({
           onQualityChange={onQualityChange}
           lang={lang}
           onLangChange={onLangChange}
+          keybinds={keybinds}
+          onKeybindsChange={onKeybindsChange}
           onClose={() => setSettingsOpen(false)}
         />
       )}

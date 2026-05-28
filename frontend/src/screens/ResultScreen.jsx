@@ -68,7 +68,7 @@ const TeamSheet = ({ side, player, draft, universe, align, imgUrl, lang }) => (
 const ResultScreen = ({ universe, p1, p2, draft, onRestart, imgUrl, version, lang }) => (
   <div className={`stage acc-${universe.id}`} data-screen-label="04 Result">
     <Atmos particles={true} />
-    <AppBar phase="ROSTER LOCKED" universe={universe} mode="MATCH READY" step="03 / 03" version={version} />
+    <AppBar phase="ROSTER LOCKED" universe={universe} mode={t('matchReady', lang)} step="03 / 03" version={version} lang={lang} />
 
     <div style={{ position: "absolute", top: 100, left: 0, right: 0, textAlign: "center" }}>
       <div className="label" style={{ justifyContent: "center", display: "inline-flex" }}>

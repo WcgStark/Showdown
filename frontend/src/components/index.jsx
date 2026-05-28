@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { t } from '../i18n'
+import { KEYBIND_ACTIONS, DEFAULT_KEYBINDS, codeLabel } from '../keybinds'
 
 /* ============ ICONS (simple, line) ============ */
 export const Icon = ({ name, size = 16 }) => {
@@ -62,7 +63,14 @@ export const Atmos = ({ glow = true, grid = true, particles = true }) => (
 )
 
 /* ============ AppBar ============ */
-export const AppBar = ({ phase = "LOBBY", universe, mode, step, version }) => (
+const PHASE_KEY = {
+  LOBBY: "phaseLobby",
+  ROSTER: "phaseRoster",
+  DRAFTING: "phaseDrafting",
+  "ROSTER LOCKED": "phaseRosterLocked",
+}
+
+export const AppBar = ({ phase = "LOBBY", universe, mode, step, version, lang = "en" }) => (
   <div className="appbar">
     <div className="brand">
       <div className="mark" />
@@ -72,10 +80,10 @@ export const AppBar = ({ phase = "LOBBY", universe, mode, step, version }) => (
       </span>
     </div>
     <div className="meta">
-      <div><span style={{ color: "var(--ink-3)" }}>PHASE</span> <b>{phase}</b></div>
-      {universe && <div><span style={{ color: "var(--ink-3)" }}>UNIVERSE</span> <b>{universe.tag}</b></div>}
-      {mode && <div><span style={{ color: "var(--ink-3)" }}>MODE</span> <b>{mode}</b></div>}
-      {step && <div><span style={{ color: "var(--ink-3)" }}>STEP</span> <b>{step}</b></div>}
+      <div><span style={{ color: "var(--ink-3)" }}>{t('phaseLabel', lang)}</span> <b>{PHASE_KEY[phase] ? t(PHASE_KEY[phase], lang) : phase}</b></div>
+      {universe && <div><span style={{ color: "var(--ink-3)" }}>{t('universeLabel', lang)}</span> <b>{universe.tag}</b></div>}
+      {mode && <div><span style={{ color: "var(--ink-3)" }}>{t('modeLabel', lang)}</span> <b>{mode}</b></div>}
+      {step && <div><span style={{ color: "var(--ink-3)" }}>{t('stepLabel', lang)}</span> <b>{step}</b></div>}
     </div>
   </div>
 )
@@ -92,7 +100,26 @@ export const ImgPh = ({ label = "PORTRAIT", aspect = "3 / 4", style }) => (
 )
 
 /* ============ Settings modal (shared) ============ */
-export const SettingsModal = ({ volume, onVolumeChange, quality, onQualityChange, lang, onLangChange, onClose }) => (
+export const SettingsModal = ({ volume, onVolumeChange, quality, onQualityChange, lang, onLangChange, keybinds, onKeybindsChange, onClose }) => {
+  const [listening, setListening] = useState(null)
+
+  // Capture the next key press to rebind the action being listened for.
+  useEffect(() => {
+    if (!listening) return
+    const onKey = e => {
+      e.preventDefault()
+      e.stopPropagation()
+      if (e.code === "Escape") { setListening(null); return }
+      onKeybindsChange?.({ ...keybinds, [listening]: e.code })
+      setListening(null)
+    }
+    window.addEventListener("keydown", onKey, true)
+    return () => window.removeEventListener("keydown", onKey, true)
+  }, [listening, keybinds, onKeybindsChange])
+
+  const bindsView = keybinds || DEFAULT_KEYBINDS
+
+  return (
   <div
     onClick={onClose}
     style={{
@@ -241,9 +268,62 @@ export const SettingsModal = ({ volume, onVolumeChange, quality, onQualityChange
           ))}
         </div>
       </div>
+
+      {/* Divider */}
+      <div style={{ height: 1, background: "var(--line-2)", margin: "28px 0" }} />
+
+      {/* Controls / Keybinds */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="square" style={{ color: "var(--ink-2)" }}>
+              <rect x="2" y="6" width="20" height="12" rx="2" />
+              <path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8" />
+            </svg>
+            <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-2)", letterSpacing: "0.16em" }}>
+              {t('controls', lang)}
+            </span>
+          </div>
+          <button
+            onClick={() => onKeybindsChange?.({ ...DEFAULT_KEYBINDS })}
+            style={{
+              background: "var(--bg-glass)", border: "1px solid var(--line-2)",
+              color: "var(--ink-2)", cursor: "pointer", borderRadius: 6,
+              padding: "5px 12px", fontFamily: "var(--f-mono)", fontSize: 10, letterSpacing: "0.14em",
+            }}
+          >{t('resetDefaults', lang)}</button>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {KEYBIND_ACTIONS.map(action => {
+            const isListening = listening === action.id
+            return (
+              <div key={action.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-1)", letterSpacing: "0.12em" }}>
+                  {t(action.labelKey, lang)}
+                </span>
+                <button
+                  onClick={() => setListening(isListening ? null : action.id)}
+                  style={{
+                    minWidth: 96, padding: "7px 14px",
+                    background: isListening ? "color-mix(in oklab, var(--acc) 18%, transparent)" : "var(--bg-glass)",
+                    border: `1px solid ${isListening ? "var(--acc)" : "var(--line-2)"}`,
+                    borderRadius: 6, cursor: "pointer",
+                    color: isListening ? "var(--acc)" : "var(--ink-0)",
+                    fontFamily: "var(--f-mono)", fontSize: 11, letterSpacing: "0.14em",
+                  }}
+                >
+                  {isListening ? t('pressKey', lang) : codeLabel(bindsView[action.id])}
+                </button>
+              </div>
+            )
+          })}
+        </div>
+      </div>
     </div>
   </div>
-)
+  )
+}
 
 /* ============ Corner tick marks ============ */
 export const CornerTicks = ({ color = "var(--acc)" }) => (

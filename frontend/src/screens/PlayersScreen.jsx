@@ -1,5 +1,7 @@
+import { useEffect } from 'react'
 import { Atmos, AppBar, Icon, CornerTicks } from '../components'
 import { t } from '../i18n'
+import { codeLabel } from '../keybinds'
 
 const QUICK_NAMES_FALLBACK = ["ALEX", "RYU", "MIKA", "JIN", "NOVA", "ZED", "KIRA", "OBI"]
 
@@ -62,14 +64,29 @@ const PlayerCard = ({ side, value, setValue, align, quickNames, lang }) => (
   </div>
 )
 
-const PlayersScreen = ({ universe, mode, setMode, p1, p2, setP1, setP2, onBack, onStart, quickNames, version, lang }) => {
+const PlayersScreen = ({ universe, mode, setMode, p1, p2, setP1, setP2, onBack, onStart, quickNames, version, lang, keybinds }) => {
   const resolvedQuickNames = (quickNames && quickNames.length)
     ? quickNames.map(n => n.toUpperCase())
     : QUICK_NAMES_FALLBACK
+  const canStart = p1.trim() && p2.trim()
+
+  // Keyboard: back / enter the draft
+  useEffect(() => {
+    const onKey = e => {
+      // don't hijack typing keys while a name field is focused
+      const typing = e.target?.tagName === "INPUT" && (e.code.startsWith("Key") || e.code.startsWith("Digit"))
+      if (typing) return
+      if (e.code === keybinds.back) { e.preventDefault(); onBack() }
+      else if (e.code === keybinds.confirm && canStart) { e.preventDefault(); onStart() }
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [keybinds, canStart, onBack, onStart])
+
   return (
     <div className={`stage acc-${universe.id}`} data-screen-label="02 Players">
       <Atmos particles={false} />
-      <AppBar phase="ROSTER" universe={universe} mode={mode} step="02 / 03" version={version} />
+      <AppBar phase="ROSTER" universe={universe} mode={mode} step="02 / 03" version={version} lang={lang} />
 
       <div style={{ position: "absolute", top: 110, left: 0, right: 0, textAlign: "center" }}>
         <div className="label" style={{ justifyContent: "center", display: "inline-flex" }}>
@@ -111,9 +128,6 @@ const PlayersScreen = ({ universe, mode, setMode, p1, p2, setP1, setP2, onBack, 
               fontWeight: 700,
             }}>
               VS
-            </div>
-            <div style={{ color: "var(--ink-3)", fontFamily: "var(--f-mono)", fontSize: 11, letterSpacing: "0.2em", marginTop: 6 }}>
-              {t('bestOfSix', lang)}
             </div>
           </div>
         </div>
@@ -159,11 +173,11 @@ const PlayersScreen = ({ universe, mode, setMode, p1, p2, setP1, setP2, onBack, 
       }}>
         <button className="btn btn-ghost" onClick={onBack}>
           <Icon name="undo" /> {t('back', lang)}
-          <span className="kbd">ESC</span>
+          <span className="kbd">{codeLabel(keybinds.back)}</span>
         </button>
-        <button className="btn btn-primary" onClick={onStart} disabled={!p1.trim() || !p2.trim()}>
+        <button className="btn btn-primary" onClick={onStart} disabled={!canStart}>
           {t('enterDraft', lang)} <Icon name="arrow" />
-          <span className="kbd">ENTER</span>
+          <span className="kbd">{codeLabel(keybinds.confirm)}</span>
         </button>
       </div>
     </div>

@@ -1,12 +1,14 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Atmos, AppBar, Icon, CornerTicks, SettingsModal } from '../components'
 import { t } from '../i18n'
+import { codeLabel } from '../keybinds'
 
 const LANDSCAPE = {
   onepiece:   "./landscape/landscape%20onepiece.jpg",
   naruto:     "./landscape/landscape%20naruto.jpg",
   bleach:     "./landscape/landscape%20bleach.jpg",
   invincible: "./landscape/landscape%20invincible.jpg",
+  jojo:       "./landscape/jojo%20landscape.jpg",
 }
 
 const UniverseCard = ({ universe, active, onHover, onClick }) => {
@@ -63,13 +65,27 @@ const UniverseCard = ({ universe, active, onHover, onClick }) => {
   )
 }
 
-const LobbyScreen =({ universes, onSelect, selectedId, setSelectedId, version, volume, onVolumeChange, quality, onQualityChange, lang, onLangChange }) => {
+const LobbyScreen =({ universes, onSelect, selectedId, setSelectedId, version, volume, onVolumeChange, quality, onQualityChange, lang, onLangChange, keybinds, onKeybindsChange }) => {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const sel = universes.find(u => u.id === selectedId) || universes[0]
+
+  // Keyboard: confirm selection / close settings
+  useEffect(() => {
+    const onKey = e => {
+      if (settingsOpen) {
+        if (e.code === keybinds.back) { e.preventDefault(); setSettingsOpen(false) }
+        return
+      }
+      if (e.code === keybinds.confirm) { e.preventDefault(); onSelect(sel.id) }
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [settingsOpen, keybinds, sel.id, onSelect])
+
   return (
     <div className={`stage acc-${sel.id}`} data-screen-label="01 Lobby">
       <Atmos />
-      <AppBar phase="LOBBY" version={version} />
+      <AppBar phase="LOBBY" version={version} lang={lang} />
 
       {/* Title block */}
       <div style={{
@@ -90,10 +106,12 @@ const LobbyScreen =({ universes, onSelect, selectedId, setSelectedId, version, v
         </h1>
       </div>
 
-      {/* Card grid */}
+      {/* Card grid — adapts to universe count */}
       <div style={{
         position: "absolute", top: 340, left: 120, right: 120, bottom: 200,
-        display: "grid", gridTemplateColumns: "1fr 1fr", gridTemplateRows: "1fr 1fr",
+        display: "grid",
+        gridTemplateColumns: `repeat(${universes.length <= 4 ? 2 : 3}, 1fr)`,
+        gridTemplateRows: `repeat(${Math.ceil(universes.length / (universes.length <= 4 ? 2 : 3))}, 1fr)`,
         gap: 28, zIndex: 3,
       }}>
         {universes.map(u => (
@@ -124,7 +142,7 @@ const LobbyScreen =({ universes, onSelect, selectedId, setSelectedId, version, v
           </button>
           <button className="btn btn-primary" onClick={() => onSelect(sel.id)}>
             {t('confirmSelection', lang)} <Icon name="arrow" />
-            <span className="kbd">ENTER</span>
+            <span className="kbd">{codeLabel(keybinds.confirm)}</span>
           </button>
         </div>
       </div>
@@ -137,6 +155,8 @@ const LobbyScreen =({ universes, onSelect, selectedId, setSelectedId, version, v
           onQualityChange={onQualityChange}
           lang={lang}
           onLangChange={onLangChange}
+          keybinds={keybinds}
+          onKeybindsChange={onKeybindsChange}
           onClose={() => setSettingsOpen(false)}
         />
       )}
