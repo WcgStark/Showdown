@@ -404,8 +404,8 @@ const ActionPanel = ({
 const DraftScreen = ({
   universe, p1, p2, draft, onFinish, mode,
   onGacha, onAssign, onSkip, onUndo, onSwitch, imgUrl,
-  onMenu, onPlayers, onPass, version, uiVolume, sfxVolume, lang,
-  onUiVolumeChange, onSfxVolumeChange, quality, onQualityChange, onLangChange,
+  onMenu, onPlayers, onPass, version, uiVolume, sfxVolume, musicVolume, lang,
+  onUiVolumeChange, onSfxVolumeChange, onMusicVolumeChange, quality, onQualityChange, onLangChange,
   keybinds, onKeybindsChange,
 }) => {
   const positions = universe.positions
@@ -615,6 +615,8 @@ const DraftScreen = ({
           onUiVolumeChange={onUiVolumeChange}
           sfxVolume={sfxVolume}
           onSfxVolumeChange={onSfxVolumeChange}
+          musicVolume={musicVolume}
+          onMusicVolumeChange={onMusicVolumeChange}
           quality={quality}
           onQualityChange={onQualityChange}
           lang={lang}

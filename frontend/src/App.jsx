@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { setUiVolume, setSfxVolume } from './sounds'
+import { setUiVolume, setSfxVolume, setMusicVolume, playMusic, stopMusic } from './sounds'
 import { loadKeybinds } from './keybinds'
 import LobbyScreen from './screens/LobbyScreen'
 import PlayersScreen from './screens/PlayersScreen'
@@ -47,6 +47,9 @@ const App = () => {
   const [sfxVolume, setSfxVol] = useState(
     () => parseFloat(localStorage.getItem("hakiSfxVolume") ?? _legacyVol ?? "0.9")
   )
+  const [musicVolume, setMusicVol] = useState(
+    () => parseFloat(localStorage.getItem("hakiMusicVolume") ?? "0.5")
+  )
   useEffect(() => {
     localStorage.setItem("hakiUiVolume", uiVolume)
     setUiVolume(uiVolume)
@@ -55,6 +58,10 @@ const App = () => {
     localStorage.setItem("hakiSfxVolume", sfxVolume)
     setSfxVolume(sfxVolume)
   }, [sfxVolume])
+  useEffect(() => {
+    localStorage.setItem("hakiMusicVolume", musicVolume)
+    setMusicVolume(musicVolume)
+  }, [musicVolume])
 
   const [quality, setQuality] = useState(
     () => localStorage.getItem("hakiQuality") ?? "rtx"
@@ -86,6 +93,15 @@ const App = () => {
       document.removeEventListener("fullscreenchange", onResize)
     }
   }, [])
+
+  // ── Universe music: play during ROSTER + DRAFT, stop elsewhere ────────────
+  useEffect(() => {
+    if ((screen === "players" || screen === "draft") && universeConfig?.musicUrls?.length) {
+      playMusic(universeConfig.musicUrls)
+    } else {
+      stopMusic()
+    }
+  }, [screen, universeConfig])
 
   // ── F11 fullscreen toggle ─────────────────────────────────────────────────
   useEffect(() => {
@@ -253,6 +269,8 @@ const App = () => {
             onUiVolumeChange={setUiVol}
             sfxVolume={sfxVolume}
             onSfxVolumeChange={setSfxVol}
+            musicVolume={musicVolume}
+            onMusicVolumeChange={setMusicVol}
             quality={quality}
             onQualityChange={setQuality}
             lang={lang}
@@ -300,9 +318,11 @@ const App = () => {
             version={config.version}
             uiVolume={uiVolume}
             sfxVolume={sfxVolume}
+            musicVolume={musicVolume}
             lang={lang}
             onUiVolumeChange={setUiVol}
             onSfxVolumeChange={setSfxVol}
+            onMusicVolumeChange={setMusicVol}
             quality={quality}
             onQualityChange={setQuality}
             onLangChange={setLang}

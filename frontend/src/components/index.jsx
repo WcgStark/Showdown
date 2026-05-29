@@ -119,8 +119,79 @@ const VolumeSlider = ({ label, value, onChange }) => (
   </div>
 )
 
-export const SettingsModal = ({ uiVolume, onUiVolumeChange, sfxVolume, onSfxVolumeChange, quality, onQualityChange, lang, onLangChange, keybinds, onKeybindsChange, onClose }) => {
+/* ----- Settings tab icons ----- */
+const TabIcon = ({ id, size = 18 }) => {
+  const stroke = { fill: "none", stroke: "currentColor", strokeWidth: 1.6, strokeLinecap: "square" }
+  if (id === "graphics") return (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
+      <rect x="2" y="4" width="20" height="14" rx="2" />
+      <path d="M8 21h8M12 18v3" />
+    </svg>
+  )
+  if (id === "audio") return (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
+      <path d="M11 5L6 9H2v6h4l5 4V5z" />
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+    </svg>
+  )
+  if (id === "controls") return (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
+      <rect x="2" y="6" width="20" height="12" rx="2" />
+      <path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8" />
+    </svg>
+  )
+  if (id === "language") return (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    </svg>
+  )
+  return null
+}
+
+/* ----- Reusable option card grid (for Quality / Language) ----- */
+const OptionGrid = ({ options, value, onChange, lang }) => (
+  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+    {options.map(opt => {
+      const active = value === opt.id
+      const label = opt.labelKey ? t(opt.labelKey, lang) : opt.label
+      return (
+        <button
+          key={opt.id}
+          onClick={() => onChange(opt.id)}
+          style={{
+            padding: "12px 16px",
+            background: active ? "color-mix(in oklab, var(--acc) 18%, transparent)" : "var(--bg-glass)",
+            border: `1px solid ${active ? "var(--acc)" : "var(--line-2)"}`,
+            borderRadius: 8, cursor: "pointer", textAlign: "left", transition: "all 120ms ease",
+          }}
+        >
+          <div style={{ fontFamily: "var(--f-display)", fontWeight: 700, fontSize: 14, color: active ? "var(--acc)" : "var(--ink-1)", letterSpacing: "0.12em", marginBottom: 4 }}>
+            {label}
+          </div>
+          <div style={{ fontFamily: "var(--f-mono)", fontSize: 10, color: "var(--ink-3)", letterSpacing: "0.08em" }}>
+            {t(opt.descKey, lang)}
+          </div>
+        </button>
+      )
+    })}
+  </div>
+)
+
+/* ----- Section header with icon (used inside tabs) ----- */
+const SectionHeader = ({ iconId, label }) => (
+  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+    <span style={{ color: "var(--ink-2)" }}><TabIcon id={iconId} size={16} /></span>
+    <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-2)", letterSpacing: "0.16em" }}>
+      {label}
+    </span>
+  </div>
+)
+
+export const SettingsModal = ({ uiVolume, onUiVolumeChange, sfxVolume, onSfxVolumeChange, musicVolume, onMusicVolumeChange, quality, onQualityChange, lang, onLangChange, keybinds, onKeybindsChange, onClose }) => {
   const [listening, setListening] = useState(null)
+  const [tab, setTab] = useState("graphics")
 
   // Capture the next key press to rebind the action being listened for.
   useEffect(() => {
@@ -138,6 +209,13 @@ export const SettingsModal = ({ uiVolume, onUiVolumeChange, sfxVolume, onSfxVolu
 
   const bindsView = keybinds || DEFAULT_KEYBINDS
 
+  const TABS = [
+    { id: "graphics", labelKey: "tabGraphics" },
+    { id: "audio",    labelKey: "tabAudio"    },
+    { id: "controls", labelKey: "tabControls" },
+    { id: "language", labelKey: "tabLanguage" },
+  ]
+
   return (
   <div
     onClick={onClose}
@@ -150,17 +228,17 @@ export const SettingsModal = ({ uiVolume, onUiVolumeChange, sfxVolume, onSfxVolu
     <div
       onClick={e => e.stopPropagation()}
       style={{
-        width: 480,
+        width: 720,
         background: "var(--bg-1)",
         border: "1px solid var(--line-2)",
         borderRadius: 16,
-        padding: "36px 40px",
         maxHeight: "90vh",
-        overflowY: "auto",
+        display: "flex", flexDirection: "column",
+        overflow: "hidden",
       }}
     >
       {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "28px 36px 20px" }}>
         <div>
           <div style={{ fontFamily: "var(--f-mono)", fontSize: 10, color: "var(--ink-3)", letterSpacing: "0.2em", marginBottom: 4 }}>
             {t('configuration', lang)}
@@ -178,151 +256,126 @@ export const SettingsModal = ({ uiVolume, onUiVolumeChange, sfxVolume, onSfxVolu
         >×</button>
       </div>
 
-      {/* Audio — UI and SFX channels */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="square" style={{ color: "var(--ink-2)" }}>
-            <path d="M11 5L6 9H2v6h4l5 4V5z"/>
-            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
-            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-          </svg>
-          <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-2)", letterSpacing: "0.16em" }}>
-            {t('audioVolume', lang)}
-          </span>
-        </div>
-        <VolumeSlider label={t('uiVolume', lang)}  value={uiVolume}  onChange={onUiVolumeChange} />
-        <VolumeSlider label={t('sfxVolume', lang)} value={sfxVolume} onChange={onSfxVolumeChange} />
-      </div>
-
-      {/* Divider */}
-      <div style={{ height: 1, background: "var(--line-2)", margin: "28px 0" }} />
-
-      {/* Quality */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="square" style={{ color: "var(--ink-2)" }}>
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-          </svg>
-          <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-2)", letterSpacing: "0.16em" }}>
-            {t('quality', lang)}
-          </span>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-          {[
-            { id: "rtx",    label: "RTX",    descKey: "rtxDesc"    },
-            { id: "potato", label: "POTATO", descKey: "potatoDesc" },
-          ].map(opt => (
+      {/* Tab bar */}
+      <div style={{
+        display: "flex", gap: 4, padding: "0 36px",
+        borderBottom: "1px solid var(--line-2)",
+      }}>
+        {TABS.map(tb => {
+          const active = tab === tb.id
+          return (
             <button
-              key={opt.id}
-              onClick={() => onQualityChange(opt.id)}
+              key={tb.id}
+              onClick={() => setTab(tb.id)}
               style={{
-                padding: "12px 16px",
-                background: quality === opt.id ? "color-mix(in oklab, var(--acc) 18%, transparent)" : "var(--bg-glass)",
-                border: `1px solid ${quality === opt.id ? "var(--acc)" : "var(--line-2)"}`,
-                borderRadius: 8, cursor: "pointer", textAlign: "left", transition: "all 120ms ease",
+                display: "flex", alignItems: "center", gap: 8,
+                background: "transparent",
+                border: "none",
+                borderBottom: `2px solid ${active ? "var(--acc)" : "transparent"}`,
+                color: active ? "var(--acc)" : "var(--ink-3)",
+                cursor: "pointer",
+                padding: "12px 16px", marginBottom: -1,
+                fontFamily: "var(--f-mono)", fontSize: 11, letterSpacing: "0.18em",
+                transition: "color 120ms ease, border-color 120ms ease",
               }}
             >
-              <div style={{ fontFamily: "var(--f-display)", fontWeight: 700, fontSize: 14, color: quality === opt.id ? "var(--acc)" : "var(--ink-1)", letterSpacing: "0.12em", marginBottom: 4 }}>
-                {opt.label}
-              </div>
-              <div style={{ fontFamily: "var(--f-mono)", fontSize: 10, color: "var(--ink-3)", letterSpacing: "0.08em" }}>
-                {t(opt.descKey, lang)}
-              </div>
+              <TabIcon id={tb.id} size={14} />
+              {t(tb.labelKey, lang)}
             </button>
-          ))}
-        </div>
+          )
+        })}
       </div>
 
-      {/* Divider */}
-      <div style={{ height: 1, background: "var(--line-2)", margin: "28px 0" }} />
+      {/* Tab content */}
+      <div style={{ padding: "28px 36px", overflowY: "auto", flex: 1 }}>
 
-      {/* Language */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="square" style={{ color: "var(--ink-2)" }}>
-            <circle cx="12" cy="12" r="10" />
-            <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-          </svg>
-          <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-2)", letterSpacing: "0.16em" }}>
-            {t('language', lang)}
-          </span>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-          {[
-            { id: "en", labelKey: "langEn", descKey: "langEnDesc" },
-            { id: "pt", labelKey: "langPt", descKey: "langPtDesc" },
-          ].map(opt => (
-            <button
-              key={opt.id}
-              onClick={() => onLangChange(opt.id)}
-              style={{
-                padding: "12px 16px",
-                background: lang === opt.id ? "color-mix(in oklab, var(--acc) 18%, transparent)" : "var(--bg-glass)",
-                border: `1px solid ${lang === opt.id ? "var(--acc)" : "var(--line-2)"}`,
-                borderRadius: 8, cursor: "pointer", textAlign: "left", transition: "all 120ms ease",
-              }}
-            >
-              <div style={{ fontFamily: "var(--f-display)", fontWeight: 700, fontSize: 14, color: lang === opt.id ? "var(--acc)" : "var(--ink-1)", letterSpacing: "0.12em", marginBottom: 4 }}>
-                {t(opt.labelKey, lang)}
-              </div>
-              <div style={{ fontFamily: "var(--f-mono)", fontSize: 10, color: "var(--ink-3)", letterSpacing: "0.08em" }}>
-                {t(opt.descKey, lang)}
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Divider */}
-      <div style={{ height: 1, background: "var(--line-2)", margin: "28px 0" }} />
-
-      {/* Controls / Keybinds */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="square" style={{ color: "var(--ink-2)" }}>
-              <rect x="2" y="6" width="20" height="12" rx="2" />
-              <path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8" />
-            </svg>
-            <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-2)", letterSpacing: "0.16em" }}>
-              {t('controls', lang)}
-            </span>
+        {tab === "graphics" && (
+          <div>
+            <SectionHeader iconId="graphics" label={t('quality', lang)} />
+            <OptionGrid
+              options={[
+                { id: "rtx",    label: "RTX",    descKey: "rtxDesc"    },
+                { id: "potato", label: "POTATO", descKey: "potatoDesc" },
+              ]}
+              value={quality}
+              onChange={onQualityChange}
+              lang={lang}
+            />
           </div>
-          <button
-            onClick={() => onKeybindsChange?.({ ...DEFAULT_KEYBINDS })}
-            style={{
-              background: "var(--bg-glass)", border: "1px solid var(--line-2)",
-              color: "var(--ink-2)", cursor: "pointer", borderRadius: 6,
-              padding: "5px 12px", fontFamily: "var(--f-mono)", fontSize: 10, letterSpacing: "0.14em",
-            }}
-          >{t('resetDefaults', lang)}</button>
-        </div>
+        )}
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {KEYBIND_ACTIONS.map(action => {
-            const isListening = listening === action.id
-            return (
-              <div key={action.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-1)", letterSpacing: "0.12em" }}>
-                  {t(action.labelKey, lang)}
+        {tab === "audio" && (
+          <div>
+            <SectionHeader iconId="audio" label={t('audioVolume', lang)} />
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <VolumeSlider label={t('uiVolume', lang)}    value={uiVolume}    onChange={onUiVolumeChange} />
+              <VolumeSlider label={t('sfxVolume', lang)}   value={sfxVolume}   onChange={onSfxVolumeChange} />
+              <VolumeSlider label={t('musicVolume', lang)} value={musicVolume} onChange={onMusicVolumeChange} />
+            </div>
+          </div>
+        )}
+
+        {tab === "controls" && (
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ color: "var(--ink-2)" }}><TabIcon id="controls" size={16} /></span>
+                <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-2)", letterSpacing: "0.16em" }}>
+                  {t('controls', lang)}
                 </span>
-                <button
-                  onClick={() => setListening(isListening ? null : action.id)}
-                  style={{
-                    minWidth: 96, padding: "7px 14px",
-                    background: isListening ? "color-mix(in oklab, var(--acc) 18%, transparent)" : "var(--bg-glass)",
-                    border: `1px solid ${isListening ? "var(--acc)" : "var(--line-2)"}`,
-                    borderRadius: 6, cursor: "pointer",
-                    color: isListening ? "var(--acc)" : "var(--ink-0)",
-                    fontFamily: "var(--f-mono)", fontSize: 11, letterSpacing: "0.14em",
-                  }}
-                >
-                  {isListening ? t('pressKey', lang) : codeLabel(bindsView[action.id])}
-                </button>
               </div>
-            )
-          })}
-        </div>
+              <button
+                onClick={() => onKeybindsChange?.({ ...DEFAULT_KEYBINDS })}
+                style={{
+                  background: "var(--bg-glass)", border: "1px solid var(--line-2)",
+                  color: "var(--ink-2)", cursor: "pointer", borderRadius: 6,
+                  padding: "5px 12px", fontFamily: "var(--f-mono)", fontSize: 10, letterSpacing: "0.14em",
+                }}
+              >{t('resetDefaults', lang)}</button>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {KEYBIND_ACTIONS.map(action => {
+                const isListening = listening === action.id
+                return (
+                  <div key={action.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-1)", letterSpacing: "0.12em" }}>
+                      {t(action.labelKey, lang)}
+                    </span>
+                    <button
+                      onClick={() => setListening(isListening ? null : action.id)}
+                      style={{
+                        minWidth: 96, padding: "7px 14px",
+                        background: isListening ? "color-mix(in oklab, var(--acc) 18%, transparent)" : "var(--bg-glass)",
+                        border: `1px solid ${isListening ? "var(--acc)" : "var(--line-2)"}`,
+                        borderRadius: 6, cursor: "pointer",
+                        color: isListening ? "var(--acc)" : "var(--ink-0)",
+                        fontFamily: "var(--f-mono)", fontSize: 11, letterSpacing: "0.14em",
+                      }}
+                    >
+                      {isListening ? t('pressKey', lang) : codeLabel(bindsView[action.id])}
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {tab === "language" && (
+          <div>
+            <SectionHeader iconId="language" label={t('language', lang)} />
+            <OptionGrid
+              options={[
+                { id: "en", labelKey: "langEn", descKey: "langEnDesc" },
+                { id: "pt", labelKey: "langPt", descKey: "langPtDesc" },
+              ]}
+              value={lang}
+              onChange={onLangChange}
+              lang={lang}
+            />
+          </div>
+        )}
+
       </div>
     </div>
   </div>

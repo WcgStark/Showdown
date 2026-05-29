@@ -1,18 +1,25 @@
-// Two independent audio channels — UI clicks vs SFX (haki, future per-universe
-// effects). Each volume is a module-level value updated from App via setters,
-// and exposed via getters so components mount-time captures still see live
-// updates (since the value is read at play() time).
+// Three independent audio channels — UI clicks, SFX (haki etc), and Music.
+// Volumes are module-level so play() reads them live (no captured-stale value).
 
-let _uiVol  = 0.9
-let _sfxVol = 0.9
+let _uiVol    = 0.9
+let _sfxVol   = 0.9
+let _musicVol = 0.5
 
-export const setUiVolume  = (v) => { _uiVol  = v }
-export const setSfxVolume = (v) => { _sfxVol = v }
-
-export const getUiVolume  = () => _uiVol
-export const getSfxVolume = () => _sfxVol
+let _music = null
+let _musicSrc = null
 
 const clamp = (v) => Math.max(0, Math.min(1, v))
+
+export const setUiVolume    = (v) => { _uiVol    = v }
+export const setSfxVolume   = (v) => { _sfxVol   = v }
+export const setMusicVolume = (v) => {
+  _musicVol = v
+  if (_music) _music.volume = clamp(v)
+}
+
+export const getUiVolume    = () => _uiVol
+export const getSfxVolume   = () => _sfxVol
+export const getMusicVolume = () => _musicVol
 
 export const playUi = () => {
   try {
@@ -20,6 +27,37 @@ export const playUi = () => {
     a.volume = clamp(_uiVol)
     a.play().catch(() => {})
   } catch {}
+}
+
+export const playUiHover = () => {
+  try {
+    const a = new Audio('./sounds/ui%20hover.mp3')
+    a.volume = clamp(_uiVol)
+    a.play().catch(() => {})
+  } catch {}
+}
+
+export const playMusic = (urls) => {
+  if (!urls || urls.length === 0) { stopMusic(); return }
+  const url = urls[Math.floor(Math.random() * urls.length)]
+  if (_music && _musicSrc === url) return
+  stopMusic()
+  try {
+    _music = new Audio(encodeURI(url))
+    _music.volume = clamp(_musicVol)
+    _music.loop = true
+    _music.play().catch(() => {})
+    _musicSrc = url
+  } catch {}
+}
+
+export const stopMusic = () => {
+  if (_music) {
+    try { _music.pause() } catch {}
+    _music.src = ''
+    _music = null
+  }
+  _musicSrc = null
 }
 
 // Global listener — fires for every <button> click anywhere in the app

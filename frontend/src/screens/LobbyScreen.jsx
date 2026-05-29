@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Atmos, AppBar, Icon, CornerTicks, SettingsModal } from '../components'
 import { t } from '../i18n'
 import { codeLabel } from '../keybinds'
+import { playUi, playUiHover } from '../sounds'
 
 const LANDSCAPE = {
   onepiece:   "./landscape/landscape%20onepiece.jpg",
@@ -65,7 +66,7 @@ const UniverseCard = ({ universe, active, onHover, onClick }) => {
   )
 }
 
-const LobbyScreen =({ universes, onSelect, selectedId, setSelectedId, version, uiVolume, onUiVolumeChange, sfxVolume, onSfxVolumeChange, quality, onQualityChange, lang, onLangChange, keybinds, onKeybindsChange }) => {
+const LobbyScreen =({ universes, onSelect, selectedId, setSelectedId, version, uiVolume, onUiVolumeChange, sfxVolume, onSfxVolumeChange, musicVolume, onMusicVolumeChange, quality, onQualityChange, lang, onLangChange, keybinds, onKeybindsChange }) => {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const sel = universes.find(u => u.id === selectedId) || universes[0]
 
@@ -119,8 +120,8 @@ const LobbyScreen =({ universes, onSelect, selectedId, setSelectedId, version, u
             key={u.id}
             universe={u}
             active={u.id === sel.id}
-            onHover={() => setSelectedId(u.id)}
-            onClick={() => onSelect(u.id)}
+            onHover={() => { playUiHover(); setSelectedId(u.id) }}
+            onClick={() => { playUi(); onSelect(u.id) }}
           />
         ))}
       </div>
@@ -153,6 +154,8 @@ const LobbyScreen =({ universes, onSelect, selectedId, setSelectedId, version, u
           onUiVolumeChange={onUiVolumeChange}
           sfxVolume={sfxVolume}
           onSfxVolumeChange={onSfxVolumeChange}
+          musicVolume={musicVolume}
+          onMusicVolumeChange={onMusicVolumeChange}
           quality={quality}
           onQualityChange={onQualityChange}
           lang={lang}

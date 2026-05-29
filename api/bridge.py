@@ -37,6 +37,13 @@ class GameAPI:
                 {"key": fk, "label": fs.label}
                 for fk, fs in u.filters.items()
             ]
+            music_folder = u.name.lower()
+            music_dir = _DIST_DIR / "music" / music_folder
+            music_urls: list[str] = []
+            if music_dir.exists():
+                for f in sorted(music_dir.iterdir()):
+                    if f.suffix.lower() in (".mp3", ".ogg", ".wav", ".m4a"):
+                        music_urls.append(f"./music/{music_folder}/{f.name}")
             universes.append({
                 "id": key,
                 "name": u.name,
@@ -45,6 +52,7 @@ class GameAPI:
                 "filters": filters,
                 "defaultFilter": u.default_filter,
                 "assetFolder": u.asset_folder,
+                "musicUrls": music_urls,
             })
         return {"universes": universes, "quickNames": QUICK_NAMES, "version": _updater.APP_VERSION}
 
