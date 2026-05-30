@@ -258,7 +258,7 @@ _INV_CHARACTERS = [
     "Darkwing", "Anissa", "Allen the Alien", "Battle Beast", "Thragg",
     "Conquest", "Angstrom Levy", "Mauler Twins", "Doc Seismic", "Titan",
     "Machine Head", "Kursk", "D.A. Sinclair", "ReAnimen", "Multi-Paul",
-    "Flaxan Leader", "Oliver Grayson II", "The Immortal",
+    "Flaxan Leader", "Oliver Grayson", "The Immortal",
     "Universa", "Space Racer", "Dinosaurus", "Kregg", "Lucan",
     "Tech Jacket", "Shapesmith",
 ]
@@ -277,6 +277,11 @@ INVINCIBLE = Universe(
             label="Pool completa",
             description="Todos os personagens.",
             exclude=set(),
+        ),
+        "teste": FilterSet(
+            label="🧪  Teste  (Invincible, Omni-Man, Thragg)",
+            description="Pool de teste com apenas Invincible, Omni-Man e Thragg.",
+            exclude=set(_INV_CHARACTERS) - {"Invincible", "Omni-Man", "Thragg"},
         ),
     },
 )

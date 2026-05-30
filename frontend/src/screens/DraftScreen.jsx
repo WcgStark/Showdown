@@ -431,7 +431,7 @@ const DraftScreen = ({
   const prevSpinning = useRef(false)
   useEffect(() => {
     if (prevSpinning.current && !spinning) {
-      if (draft?.currentChar?.ext === "gif") {
+      if (draft?.currentChar?.ext === "gif" && universe.id === "onepiece") {
         setHakiActive(true)
       }
       const sfx = CHAR_SFX[draft?.currentChar?.name]

@@ -2,7 +2,7 @@ SLOT_SIZE      = 120
 IMAGE_SIZE     = 112
 PANEL_IMAGE_SZ = 150
 
-QUICK_NAMES = ["Cleitu", "Wilsu", "Dilsu"]
+QUICK_NAMES = ["Cleitu", "Wilsu", "Dilsu", "Gorbas", "Paulo"]
 
 # One Piece wooden-plank theme constants
 OP_FG_GOLD  = "#F5C842"
