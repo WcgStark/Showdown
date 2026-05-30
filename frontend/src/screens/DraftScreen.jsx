@@ -2,6 +2,13 @@ import { useState, useEffect, useRef } from 'react'
 import { Atmos, AppBar, Icon, CornerTicks, SettingsModal } from '../components'
 import { t } from '../i18n'
 import { codeLabel } from '../keybinds'
+import { playNumberOne, playYokosoWatashi, playYhwachEntrance } from '../sounds'
+
+const CHAR_SFX = {
+  "Ichigo Kurosaki": playNumberOne,
+  "Sousuke Aizen":   playYokosoWatashi,
+  "Yhwach":          playYhwachEntrance,
+}
 
 /* ── Haki effect ─────────────────────────────────────────────────── */
 // Portrait center inside the ActionPanel (right: 64, width: 380) at 1920×1080
@@ -423,11 +430,15 @@ const DraftScreen = ({
 
   const prevSpinning = useRef(false)
   useEffect(() => {
-    if (prevSpinning.current && !spinning && draft?.currentChar?.ext === "gif") {
-      setHakiActive(true)
+    if (prevSpinning.current && !spinning) {
+      if (draft?.currentChar?.ext === "gif") {
+        setHakiActive(true)
+      }
+      const sfx = CHAR_SFX[draft?.currentChar?.name]
+      if (sfx) sfx()
     }
     prevSpinning.current = spinning
-  }, [spinning, draft?.currentChar?.ext])
+  }, [spinning, draft?.currentChar?.ext, draft?.currentChar?.name])
 
   const [switchMode, setSwitchMode] = useState(false)
   const [switchFirst, setSwitchFirst] = useState(null)

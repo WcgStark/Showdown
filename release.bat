@@ -40,7 +40,7 @@ if errorlevel 1 ( echo ERRO ao gerar .exe! & pause & exit /b 1 )
 echo.
 echo [4/4] Publicando no GitHub...
 %GIT% add -u
-%GIT% add frontend\src api *.py *.bat *.spec
+%GIT% add frontend\src api assets *.py *.bat *.spec
 %GIT% commit -m "release v%VERSION%"
 %GIT% push
 gh release create v%VERSION% "dist\ShowdownDraft.exe" --title "Versao %VERSION%" --notes ""

@@ -167,14 +167,18 @@ _OP_CHARACTERS = [
     "Gecko Moria", "Absalom", "Perona", "Hogback", "Shimotsuki Ryuma", "Oars",
     "Edward Newgate", "Sakazuki", "Borsalino", "Kuzan", "Marco", "Jozu", "Vista",
     "Sengoku", "Monkey D. Garp", "Boa Hancock", "Shirahoshi",
-    "Donquixote Doflamingo", "Rebecca", "Kyros", "Diamante", "Trebol", "Pica",
-    "Senor Pink", "Sugar", "Bartolomeo", "Cavendish", "Inuarashi", "Nekomamushi",
+    "Donquixote Doflamingo", "Donquixote Rosinante", "Rebecca", "Kyros",
+    "Diamante", "Trebol", "Pica", "Senor Pink", "Sugar", "Vergo", "Monet",
+    "Caesar Clown", "Baby 5", "Buffalo", "Brownbeard", "Bellamy", "Dellinger",
+    "Mansherry", "Leo", "Bartolomeo", "Cavendish", "Inuarashi", "Nekomamushi",
     "Carrot", "Pedro", "Bepo", "Charlotte Linlin", "Charlotte Katakuri",
     "Charlotte Perospero", "Charlotte Smoothie", "Charlotte Cracker",
     "Charlotte Pudding", "Vinsmoke Reiju", "Vinsmoke Ichiji", "Vinsmoke Niji",
     "Vinsmoke Yonji", "Kaidou", "Kouzuki Oden", "Kouzuki Momonosuke", "Yamato",
     "Kin'emon", "Denjiro", "Raizo", "Kikunojo", "King", "Queen", "Jack",
-    "Vegapunk", "Sentomaru", "Issho", "Aramaki",
+    "Vegapunk", "Vegapunk Shaka", "Vegapunk Lilith", "Vegapunk Edison",
+    "Vegapunk Pythagoras", "Vegapunk Atlas", "Vegapunk York",
+    "Sentomaru", "Issho", "Aramaki",
     "Stussy", "S-Bear", "S-Hawk", "S-Shark", "S-Snake", "Dorry", "Brogy", "Loki",
     "Hajrudin", "Gerd", "Goldberg", "Road", "Oimo", "Kashii", "Stansen", "Jarul",
     "Trafalgar D. Water Law", "Eustass Kid", "Killer", "Basil Hawkins",
@@ -186,13 +190,15 @@ _OP_CHARACTERS = [
     "Benn Beckman", "Lucky Roux", "Yasopp", "Monkey D. Dragon",
     "Nerona Imu", "Rocks D. Xebec", "Figarland Shamrock", "Satchels Maffey",
     "Rimoshifu Killingham", "Shepherd Sommers", "Manmayer Gunko", "Harald", "Ryu",
-    "Dracule Mihawk",
+    "Dracule Mihawk", "Candelle", "Zaza",
 ]
 
 _OP_SPOILERS_MANGA = {
     "Nerona Imu", "Rocks D. Xebec", "Figarland Shamrock", "Satchels Maffey",
     "Joy Boy", "Nika", "Scopper Gaban", "Rimoshifu Killingham",
-    "Shepherd Sommers", "Manmayer Gunko", "Harald",
+    "Shepherd Sommers", "Manmayer Gunko", "Harald", "Candelle", "Zaza",
+    "Vegapunk Shaka", "Vegapunk Lilith", "Vegapunk Edison",
+    "Vegapunk Pythagoras", "Vegapunk Atlas", "Vegapunk York",
 }
 
 _OP_POST_WANO = {
@@ -202,7 +208,9 @@ _OP_POST_WANO = {
     "Gerd", "Goldberg", "Road", "Stansen", "Jarul",
     "Nerona Imu", "Rocks D. Xebec", "Figarland Shamrock", "Satchels Maffey",
     "Joy Boy", "Nika", "Scopper Gaban", "Rimoshifu Killingham",
-    "Shepherd Sommers", "Manmayer Gunko", "Harald",
+    "Shepherd Sommers", "Manmayer Gunko", "Harald", "Candelle", "Zaza",
+    "Vegapunk Shaka", "Vegapunk Lilith", "Vegapunk Edison",
+    "Vegapunk Pythagoras", "Vegapunk Atlas", "Vegapunk York",
 }
 
 ONEPIECE = Universe(
@@ -437,6 +445,13 @@ BLEACH = Universe(
             description="Remove personagens exclusivos do arco final.",
             exclude=_BLEACH_TYBW_ONLY,
         ),
+        "teste": FilterSet(
+            label="🧪  Teste  (Ichigo, Aizen, Yhwach)",
+            description="Pool de teste com apenas Ichigo, Aizen e Yhwach.",
+            exclude=set(_BLEACH_CHARACTERS) - {
+                "Ichigo Kurosaki", "Sousuke Aizen", "Yhwach",
+            },
+        ),
     },
 )
 
@@ -457,17 +472,27 @@ _JOJO_CHARACTERS = [
     "Jotaro Kujo", "Avdol", "Kakyoin", "Polnareff", "Iggy",
     "Hol Horse", "J. Geil", "Vanilla Ice", "Enya", "N'Doul",
     "Daniel J. D'Arby", "Telence D'Arby",
+    "Impostor Captain Tennille", "Devo the Cursed", "Rubber Soul", "Nena",
+    "ZZ", "Steely Dan", "Arabia Fats", "Mannish Boy", "Forever", "Cameo",
+    "Midler", "Oingo", "Boingo", "Anubis", "Mariah", "Alessi",
     # Parte 4 — Diamond is Unbreakable
     "Josuke", "Koichi", "Okuyasu", "Rohan", "Kira",
-    "Yukako", "Shigechi", "Akira", "Angelo",
+    "Yukako", "Shigechi", "Akira Otoishi", "Angelo",
+    "Keicho Nijimura", "Toshikazu Hazamada", "Tamami Kobayashi",
+    "Ken Oyanagi", "Terunosuke Miyamoto", "Toyohiro Kanedaichi",
+    "Masazo Kinoto",
     # Parte 5 — Golden Wind
     "Giorno", "Bucciarati", "Mista", "Narancia", "Abbacchio", "Fugo",
     "Diavolo", "Risotto", "Prosciutto", "Pesci", "Ghiaccio",
     "Cioccolata", "Secco",
+    "Polpo", "Mario Zucchero", "Sale", "Formaggio", "Illuso", "Melone",
+    "Squalo", "Tiziano", "Carne",
     # Parte 6 — Stone Ocean
     "Jolyne", "Hermes", "Anasui", "Weather Report", "Foo Fighters",
     "Pucci", "Johngalli A", "Gwess", "Lang Rangler", "Sports Maxx",
     "Rikiel", "Versus",
+    "Thunder McQueen", "Miraschon", "Viviano Westwood", "Ungalo", "Kenzo",
+    "D an G", "Guccio",
 ]
 
 JOJO = Universe(

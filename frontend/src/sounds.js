@@ -37,6 +37,30 @@ export const playUiHover = () => {
   } catch {}
 }
 
+export const playNumberOne = () => {
+  try {
+    const a = new Audio('./sounds/Number%20One%20-%20Bankai%20-%20Shiro%20Sagisu.mp3')
+    a.volume = clamp(_sfxVol)
+    a.play().catch(() => {})
+  } catch {}
+}
+
+export const playYokosoWatashi = () => {
+  try {
+    const a = new Audio('./sounds/Yokoso%20watashi%20no%20soul%20society.mp3')
+    a.volume = clamp(_sfxVol)
+    a.play().catch(() => {})
+  } catch {}
+}
+
+export const playYhwachEntrance = () => {
+  try {
+    const a = new Audio('./sounds/Yhwach%20Entrance%20Theme.mp3')
+    a.volume = clamp(_sfxVol)
+    a.play().catch(() => {})
+  } catch {}
+}
+
 export const playMusic = (urls) => {
   if (!urls || urls.length === 0) { stopMusic(); return }
   const url = urls[Math.floor(Math.random() * urls.length)]
