@@ -54,7 +54,25 @@ class GameAPI:
                 "assetFolder": u.asset_folder,
                 "musicUrls": music_urls,
             })
-        return {"universes": universes, "quickNames": QUICK_NAMES, "version": _updater.APP_VERSION}
+        _IMG_EXT = {".png", ".jpg", ".jpeg", ".gif", ".webp"}
+        # In dev (not frozen) serve from assets/; in production from dist/ (Vite build output)
+        pfp_dir = (_BASE_DIR / "assets" / "pfp") if not getattr(sys, "frozen", False) else (_DIST_DIR / "pfp")
+        pfp_categories: list[dict] = []
+        if pfp_dir.exists():
+            root_files = sorted(
+                f.name for f in pfp_dir.iterdir()
+                if f.is_file() and f.suffix.lower() in _IMG_EXT
+            )
+            if root_files:
+                pfp_categories.append({"name": "", "files": root_files})
+            for sub in sorted(d for d in pfp_dir.iterdir() if d.is_dir()):
+                files = sorted(
+                    f.name for f in sub.iterdir()
+                    if f.is_file() and f.suffix.lower() in _IMG_EXT
+                )
+                if files:
+                    pfp_categories.append({"name": sub.name, "files": files})
+        return {"universes": universes, "quickNames": QUICK_NAMES, "version": _updater.APP_VERSION, "pfpList": pfp_categories}
 
     # ── Match lifecycle ───────────────────────────────────────────────────────
 

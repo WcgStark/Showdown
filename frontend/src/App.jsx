@@ -29,6 +29,8 @@ const App = () => {
   const [universeConfig, setUniverseConfig] = useState(null)
   const [p1, setP1]                         = useState("")
   const [p2, setP2]                         = useState("")
+  const [p1pfp, setP1pfp]                   = useState(null)
+  const [p2pfp, setP2pfp]                   = useState(null)
   const [mode, setMode]                     = useState("draft")
   const [draft, setDraft]                   = useState(null)
   const [layout, setLayout]                 = useState({ scale: 1, x: 0, y: 0 })
@@ -236,6 +238,8 @@ const App = () => {
     setDraft(null)
     setP1("")
     setP2("")
+    setP1pfp(null)
+    setP2pfp(null)
     setScreen("lobby")
   }
 
@@ -289,6 +293,11 @@ const App = () => {
             p2={p2}
             setP1={setP1}
             setP2={setP2}
+            p1pfp={p1pfp}
+            setP1pfp={setP1pfp}
+            p2pfp={p2pfp}
+            setP2pfp={setP2pfp}
+            pfpList={config.pfpList || []}
             onBack={() => setScreen("lobby")}
             onStart={handleStartGame}
             quickNames={config.quickNames}
@@ -328,6 +337,8 @@ const App = () => {
             onLangChange={setLang}
             keybinds={keybinds}
             onKeybindsChange={setKeybinds}
+            p1pfp={p1pfp}
+            p2pfp={p2pfp}
           />
         )}
 

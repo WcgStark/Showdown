@@ -73,7 +73,7 @@ const REEL_NAMES = [
 ]
 
 /* ----- Player banner ----- */
-const PlayerBanner = ({ side, player, filled, total, active, skips, lang }) => {
+const PlayerBanner = ({ side, player, filled, total, active, skips, lang, pfp }) => {
   const isLeft = side === "left"
   return (
     <div style={{
@@ -89,7 +89,10 @@ const PlayerBanner = ({ side, player, filled, total, active, skips, lang }) => {
         boxShadow: active ? "0 0 32px -4px color-mix(in oklab, var(--acc) 60%, transparent)" : "none",
       }}>
         <CornerTicks color={active ? "var(--acc)" : "var(--line-2)"} />
-        <Icon name="user" size={40} />
+        {pfp
+          ? <img src={`./pfp/${pfp.split('/').map(encodeURIComponent).join('/')}`} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "50% 20%" }} alt="" />
+          : <Icon name="user" size={40} />
+        }
         {active && (
           <div style={{
             position: "absolute", bottom: -8, [isLeft ? "left" : "right"]: -8,
@@ -370,13 +373,13 @@ const ActionPanel = ({
         <ActionBtn icon="dice" label={t('gacha', lang)} hint={codeLabel(keybinds.gacha)} primary
           onClick={onSpin} disabled={!!draft.currentChar || spinning || switchActive} fullWidth />
         <ActionBtn icon="skip" label={t('skip', lang)} hint={codeLabel(keybinds.skip)}
-          onClick={onSkip} disabled={!draft.currentChar || skipsLeft <= 0} />
+          onClick={onSkip} disabled={!draft.currentChar || skipsLeft <= 0 || spinning} />
         <ActionBtn icon="arrow" label={t('pass', lang)} hint={codeLabel(keybinds.pass)}
-          onClick={onPass} disabled={!!draft.currentChar || switchActive} />
+          onClick={onPass} disabled={!!draft.currentChar || switchActive || spinning} />
         <ActionBtn icon="swap" label={t('switch', lang)} hint={codeLabel(keybinds.switch)}
-          onClick={onSwitch} disabled={!!draft.currentChar || switchActive || myFilled < 2} />
+          onClick={onSwitch} disabled={!!draft.currentChar || switchActive || myFilled < 2 || spinning} />
         <ActionBtn icon="undo" label={t('undo', lang)} hint={codeLabel(keybinds.undo)}
-          onClick={onUndo} disabled={!draft.undoAvailable} />
+          onClick={onUndo} disabled={!draft.undoAvailable || spinning} />
       </div>
 
       <button
@@ -413,7 +416,7 @@ const DraftScreen = ({
   onGacha, onAssign, onSkip, onUndo, onSwitch, imgUrl,
   onMenu, onPlayers, onPass, version, uiVolume, sfxVolume, musicVolume, lang,
   onUiVolumeChange, onSfxVolumeChange, onMusicVolumeChange, quality, onQualityChange, onLangChange,
-  keybinds, onKeybindsChange,
+  keybinds, onKeybindsChange, p1pfp, p2pfp,
 }) => {
   const positions = universe.positions
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -519,15 +522,15 @@ const DraftScreen = ({
       if (e.code === keybinds.gacha) {
         if (!draft.currentChar && !spinning && !switchMode) { e.preventDefault(); spin() }
       } else if (e.code === keybinds.skip) {
-        if (draft.currentChar && skipsLeft > 0) { e.preventDefault(); onSkip() }
+        if (draft.currentChar && skipsLeft > 0 && !spinning) { e.preventDefault(); onSkip() }
       } else if (e.code === keybinds.pass) {
-        if (!draft.currentChar && !switchMode) { e.preventDefault(); handlePass() }
+        if (!draft.currentChar && !switchMode && !spinning) { e.preventDefault(); handlePass() }
       } else if (e.code === keybinds.switch) {
-        if (!draft.currentChar && !switchMode && myFilled >= 2) { e.preventDefault(); handleSwitch() }
+        if (!draft.currentChar && !switchMode && myFilled >= 2 && !spinning) { e.preventDefault(); handleSwitch() }
       } else if (e.code === keybinds.undo) {
-        if (draft.undoAvailable) { e.preventDefault(); onUndo() }
+        if (draft.undoAvailable && !spinning) { e.preventDefault(); onUndo() }
       } else if (e.code === keybinds.confirm) {
-        if (allDone) { e.preventDefault(); onFinish() }
+        if (allDone && !spinning) { e.preventDefault(); onFinish() }
       }
     }
     window.addEventListener("keydown", onKey)
@@ -561,11 +564,11 @@ const DraftScreen = ({
       {/* Player banners */}
       <PlayerBanner
         side="left" player={p1} filled={filledP1} total={positions.length}
-        active={draft.turn === "p1"} skips={draft.skipsP1} lang={lang}
+        active={draft.turn === "p1"} skips={draft.skipsP1} lang={lang} pfp={p1pfp}
       />
       <PlayerBanner
         side="right" player={p2} filled={filledP2} total={positions.length}
-        active={draft.turn === "p2"} skips={draft.skipsP2} lang={lang}
+        active={draft.turn === "p2"} skips={draft.skipsP2} lang={lang} pfp={p2pfp}
       />
 
       {/* MAIN GRID */}
@@ -585,7 +588,7 @@ const DraftScreen = ({
           positions={positions}
           assignments={draft.assignments}
           turn={draft.turn}
-          enabled={!!draft.currentChar && !switchMode}
+          enabled={!!draft.currentChar && !switchMode && !spinning}
           onPick={handleAssign}
           lang={lang}
         />

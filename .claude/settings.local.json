@@ -75,7 +75,11 @@
       "Read(//tmp/**)",
       "Bash(git tag *)",
       "Bash(release.bat 1.2.5)",
-      "Bash(cmd.exe /c release.bat 1.2.5)"
+      "Bash(cmd.exe /c release.bat 1.2.5)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\willi\\\\Downloads\\\\Showdown\" -Recurse -Depth 2)",
+      "Bash(Select-Object FullName, PSIsContainer)",
+      "Bash(Format-Table -AutoSize)",
+      "Bash(release.bat 1.2.7)"
     ]
   }
 }
