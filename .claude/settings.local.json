@@ -79,7 +79,11 @@
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\willi\\\\Downloads\\\\Showdown\" -Recurse -Depth 2)",
       "Bash(Select-Object FullName, PSIsContainer)",
       "Bash(Format-Table -AutoSize)",
-      "Bash(release.bat 1.2.7)"
+      "Bash(release.bat 1.2.7)",
+      "Bash(grep -E \"\\\\.py$\")",
+      "PowerShell(New-Item -ItemType Directory -Force \"c:\\\\Users\\\\willi\\\\Downloads\\\\Showdown\\\\assets\\\\arena\\\\jojo\")",
+      "PowerShell(cmd /c \"release.bat 1.2.8\" 2>&1)",
+      "PowerShell(cmd /c \"C:\\\\Users\\\\willi\\\\Downloads\\\\Showdown\\\\release.bat 1.2.8\" 2>&1)"
     ]
   }
 }

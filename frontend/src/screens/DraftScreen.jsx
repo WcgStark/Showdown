@@ -62,6 +62,221 @@ const HakiOverlay = ({ onComplete, sfxVolume = 0.9 }) => {
   )
 }
 
+/* ── Arena Modal ─────────────────────────────────────────────────────────── */
+const ArenaModal = ({ arena, universeId, onClose, lang }) => (
+  <div
+    onClick={onClose}
+    style={{
+      position: "absolute", inset: 0, zIndex: 300,
+      background: "rgba(0,0,0,0.92)",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      cursor: "pointer",
+    }}
+  >
+    <div
+      onClick={e => e.stopPropagation()}
+      style={{
+        width: 860, maxHeight: 720,
+        background: "var(--bg-elev)", border: "1px solid var(--acc-line)",
+        display: "flex", flexDirection: "column",
+        boxShadow: "0 32px 100px rgba(0,0,0,0.95)",
+        position: "relative", overflow: "hidden",
+        cursor: "default",
+      }}
+    >
+      <CornerTicks />
+
+      {/* Header with image */}
+      <div style={{ position: "relative", height: 200, flexShrink: 0, overflow: "hidden", background: "var(--bg-1)" }}>
+        <img
+          src={`./arena/${universeId}/${encodeURIComponent(arena.image)}`}
+          alt={arena.name}
+          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "50% 40%" }}
+          onError={e => { e.currentTarget.style.display = "none" }}
+        />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 30%, rgba(7,8,12,0.98) 100%)" }} />
+        <div style={{ position: "absolute", bottom: 20, left: 28, right: 60 }}>
+          <div style={{ fontFamily: "var(--f-mono)", fontSize: 10, color: "var(--acc)", letterSpacing: "0.22em", marginBottom: 6 }}>
+            {t('arenaPart', lang)} {arena.part} · {arena.partName.toUpperCase()}
+          </div>
+          <div className="display" style={{ fontSize: 30, lineHeight: 1.1, color: "var(--ink-0)" }}>{arena.name}</div>
+          <div style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-3)", marginTop: 4, letterSpacing: "0.1em" }}>{arena.flavor}</div>
+        </div>
+        <button onClick={onClose} style={{
+          position: "absolute", top: 14, right: 14,
+          background: "var(--bg-elev)", border: "1px solid var(--line)",
+          color: "var(--ink-2)", cursor: "pointer",
+          width: 30, height: 30, borderRadius: "50%",
+          display: "grid", placeItems: "center", fontSize: 13,
+        }}>✕</button>
+      </div>
+
+      {/* Body */}
+      <div style={{ overflowY: "auto", padding: "20px 28px 28px", flex: 1 }}>
+        {/* 3 columns: conditions | buffs | debuffs */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
+          {/* Conditions */}
+          <div>
+            <div style={{ fontFamily: "var(--f-mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", color: "var(--ink-2)", marginBottom: 10, textTransform: "uppercase" }}>
+              {t('arenaConditions', lang)}
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+              {arena.conditions.map((c, i) => (
+                <span key={i} style={{
+                  fontFamily: "var(--f-mono)", fontSize: 10, padding: "3px 9px",
+                  background: "var(--bg-2)", border: "1px solid var(--line)",
+                  color: "var(--ink-2)", letterSpacing: "0.06em",
+                }}>{c}</span>
+              ))}
+            </div>
+          </div>
+
+          {/* Buffs */}
+          <div>
+            <div style={{ fontFamily: "var(--f-mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", color: "#5a9e2f", marginBottom: 10, textTransform: "uppercase" }}>
+              ▲ {t('arenaBuffs', lang)}
+            </div>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+              {arena.buffs.map((b, i) => (
+                <li key={i} style={{ display: "flex", gap: 6, alignItems: "flex-start", fontSize: 11, color: "var(--ink-2)", padding: "4px 0", borderBottom: "1px solid var(--line-2)", lineHeight: 1.45 }}>
+                  <span style={{ color: "#5a9e2f", fontSize: 9, marginTop: 3, flexShrink: 0 }}>▲</span>
+                  <span>{b}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Debuffs */}
+          <div>
+            <div style={{ fontFamily: "var(--f-mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", color: "#c04040", marginBottom: 10, textTransform: "uppercase" }}>
+              ▼ {t('arenaDebuffs', lang)}
+            </div>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+              {arena.debuffs.map((d, i) => (
+                <li key={i} style={{ display: "flex", gap: 6, alignItems: "flex-start", fontSize: 11, color: "var(--ink-2)", padding: "4px 0", borderBottom: "1px solid var(--line-2)", lineHeight: 1.45 }}>
+                  <span style={{ color: "#c04040", fontSize: 9, marginTop: 3, flexShrink: 0 }}>▼</span>
+                  <span>{d}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Special event */}
+        <div style={{
+          background: "color-mix(in oklab, var(--acc) 6%, var(--bg-2))",
+          border: "1px solid var(--acc-line)",
+          padding: "12px 16px",
+          display: "flex", gap: 10, alignItems: "flex-start",
+        }}>
+          <span style={{ color: "var(--acc)", fontSize: 14, flexShrink: 0, marginTop: 1 }}>⚡</span>
+          <div>
+            <div style={{ fontFamily: "var(--f-mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", color: "var(--acc)", marginBottom: 4, textTransform: "uppercase" }}>
+              {t('arenaSpecial', lang)}
+            </div>
+            <div style={{ fontSize: 12, color: "var(--ink-1)", lineHeight: 1.5 }}>{arena.special}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+)
+
+/* ── Arena Card (top center of draft) ────────────────────────────────────── */
+const ARENA_IMG_W = 170  // each reel frame width — matches the wrapper width
+
+const ArenaCard = ({ arena, arenaSpinning, arenaReel, universeId, onRoll, onOpenModal, lang }) => {
+  const rolled = !!arena
+  const spinning = arenaSpinning
+
+  return (
+    <div
+      onClick={!rolled && !spinning ? onRoll : (rolled ? onOpenModal : undefined)}
+      className="panel"
+      style={{
+        position: "relative", overflow: "hidden",
+        width: "100%", height: "100%",
+        background: rolled ? "var(--bg-elev)" : "color-mix(in oklab, var(--acc) 5%, var(--bg-elev))",
+        borderColor: "var(--acc-line)",
+        cursor: rolled ? "pointer" : (spinning ? "default" : "pointer"),
+        display: "flex", flexDirection: "column",
+        boxShadow: rolled ? "0 0 20px -6px color-mix(in oklab, var(--acc) 40%, transparent)" : "none",
+      }}
+    >
+      <CornerTicks />
+
+      {/* Not rolled */}
+      {!rolled && !spinning && (
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4 }}>
+          <div style={{ fontFamily: "var(--f-mono)", fontSize: 9, color: "var(--acc)", letterSpacing: "0.22em" }}>
+            {t('arenaGacha', lang)}
+          </div>
+          <div style={{ fontFamily: "var(--f-mono)", fontSize: 8, color: "var(--ink-4)", letterSpacing: "0.14em" }}>
+            {t('arenaNotRolled', lang)}
+          </div>
+        </div>
+      )}
+
+      {/* Spinning — loading state before reel is built */}
+      {spinning && arenaReel.length === 0 && (
+        <div style={{ flex: 1, display: "grid", placeItems: "center", fontFamily: "var(--f-mono)", fontSize: 9, color: "var(--ink-3)", letterSpacing: "0.2em" }}>
+          {t('arenaRolling', lang)}
+        </div>
+      )}
+
+      {/* Spinning — horizontal image reel */}
+      {spinning && arenaReel.length > 0 && (
+        <>
+          {/* fade masks on left and right edges */}
+          <div style={{
+            position: "absolute", inset: 0, zIndex: 2, pointerEvents: "none",
+            background: "linear-gradient(90deg, rgba(7,8,12,0.9) 0%, transparent 18%, transparent 82%, rgba(7,8,12,0.9) 100%)",
+          }} />
+          {/* scrolling strip */}
+          <div style={{
+            position: "absolute", top: 0, left: 0, height: "100%",
+            display: "flex", flexDirection: "row",
+            animation: `arenaReelH 2s cubic-bezier(0.05, 0.85, 0.2, 1) forwards`,
+            willChange: "transform",
+          }}>
+            {arenaReel.map((a, i) => (
+              <div key={i} style={{ width: ARENA_IMG_W, height: "100%", flexShrink: 0, position: "relative", overflow: "hidden" }}>
+                <img
+                  src={`./arena/${universeId}/${encodeURIComponent(a.image)}`}
+                  alt={a.name}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "50% 40%" }}
+                  onError={e => { e.currentTarget.style.display = "none" }}
+                />
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* Rolled: static image + name overlay */}
+      {rolled && !spinning && (
+        <>
+          <img
+            src={`./arena/${universeId}/${encodeURIComponent(arena.image)}`}
+            alt={arena.name}
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "50% 40%" }}
+            onError={e => { e.currentTarget.style.display = "none" }}
+          />
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 25%, rgba(7,8,12,0.92) 100%)" }} />
+          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "6px 8px", animation: "popIn 240ms cubic-bezier(.2,.9,.3,1.4)" }}>
+            <div style={{ fontFamily: "var(--f-mono)", fontSize: 8, color: "var(--acc)", letterSpacing: "0.2em" }}>
+              PT.{arena.part} · {arena.partName.toUpperCase()}
+            </div>
+            <div className="display" style={{ fontSize: 10, lineHeight: 1.2, color: "var(--ink-0)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {arena.name.toUpperCase()}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
 /* ===================================================== */
 /* SCREEN 3 — DRAFT BOARD                                */
 /* ===================================================== */
@@ -414,7 +629,7 @@ const ActionPanel = ({
 const DraftScreen = ({
   universe, p1, p2, draft, onFinish, mode,
   onGacha, onAssign, onSkip, onUndo, onSwitch, imgUrl,
-  onMenu, onPlayers, onPass, version, uiVolume, sfxVolume, musicVolume, lang,
+  onMenu, onPlayers, onPass, onRollArena, version, uiVolume, sfxVolume, musicVolume, lang,
   onUiVolumeChange, onSfxVolumeChange, onMusicVolumeChange, quality, onQualityChange, onLangChange,
   keybinds, onKeybindsChange, p1pfp, p2pfp,
 }) => {
@@ -445,6 +660,31 @@ const DraftScreen = ({
 
   const [switchMode, setSwitchMode] = useState(false)
   const [switchFirst, setSwitchFirst] = useState(null)
+
+  const [arenaSpinning, setArenaSpinning] = useState(false)
+  const [arenaReel, setArenaReel]         = useState([])
+  const [arenaModalOpen, setArenaModalOpen] = useState(false)
+
+  const spinArena = async () => {
+    if (arenaSpinning || draft.arena) return
+    setArenaSpinning(true)
+    setArenaReel([])
+    const result = await onRollArena()
+    const resultArena = result?.arena
+    const resultName = resultArena?.name ?? "???"
+    const allArenas = (universe.arenaList || []).filter(a => a.name !== resultName)
+    for (let i = allArenas.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [allArenas[i], allArenas[j]] = [allArenas[j], allArenas[i]]
+    }
+    const body = Array.from({ length: 10 }, (_, i) => allArenas[i % Math.max(allArenas.length, 1)])
+    setArenaReel([...body, resultArena])
+    setTimeout(() => {
+      setArenaSpinning(false)
+      setArenaReel([])
+      setArenaModalOpen(true)
+    }, 2000)
+  }
 
   const spin = async () => {
     if (draft.currentChar || spinning) return
@@ -571,6 +811,21 @@ const DraftScreen = ({
         active={draft.turn === "p2"} skips={draft.skipsP2} lang={lang} pfp={p2pfp}
       />
 
+      {/* ARENA CARD — centered in the 196px gap between banners (13px each side) */}
+      {draft.arenaEnabled && (
+        <div style={{ position: "absolute", top: 80, left: 677, width: 170, height: 120 }}>
+          <ArenaCard
+            arena={draft.arena}
+            arenaSpinning={arenaSpinning}
+            arenaReel={arenaReel}
+            universeId={universe.id}
+            onRoll={spinArena}
+            onOpenModal={() => setArenaModalOpen(true)}
+            lang={lang}
+          />
+        </div>
+      )}
+
       {/* MAIN GRID */}
       <div style={{
         position: "absolute",
@@ -638,6 +893,16 @@ const DraftScreen = ({
           keybinds={keybinds}
           onKeybindsChange={onKeybindsChange}
           onClose={() => setSettingsOpen(false)}
+        />
+      )}
+
+      {/* Arena detail modal */}
+      {arenaModalOpen && draft.arena && (
+        <ArenaModal
+          arena={draft.arena}
+          universeId={universe.id}
+          onClose={() => setArenaModalOpen(false)}
+          lang={lang}
         />
       )}
 

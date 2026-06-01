@@ -231,6 +231,12 @@ const App = () => {
     setDraft(result)
   }
 
+  const handleRollArena = async () => {
+    const result = await window.pywebview.api.roll_arena()
+    setDraft(result)
+    return result
+  }
+
   const handleFinish = () => setScreen("result")
 
   const handleRestart = async () => {
@@ -324,6 +330,7 @@ const App = () => {
             onMenu={handleRestart}
             onPlayers={() => setScreen("players")}
             onPass={handlePass}
+            onRollArena={handleRollArena}
             version={config.version}
             uiVolume={uiVolume}
             sfxVolume={sfxVolume}

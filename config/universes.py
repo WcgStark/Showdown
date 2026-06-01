@@ -260,7 +260,7 @@ _INV_CHARACTERS = [
     "Machine Head", "Kursk", "D.A. Sinclair", "ReAnimen", "Multi-Paul",
     "Flaxan Leader", "Oliver Grayson", "The Immortal",
     "Universa", "Space Racer", "Dinosaurus", "Kregg", "Lucan",
-    "Tech Jacket", "Shapesmith",
+    "Tech Jacket", "Shapesmith", "Paul", "Donald Ferguson",
 ]
 
 INVINCIBLE = Universe(
@@ -508,11 +508,16 @@ JOJO = Universe(
     characters=_JOJO_CHARACTERS,
     positions=POSITIONS_STANDARD,
     theme=_build_jojo_theme(),
-    default_filter="completo",
+    default_filter="classico",
     filters={
-        "completo": FilterSet(
-            label="⭐  Completo  (Partes 1-6)",
-            description="Todos os personagens das partes 1 a 6.",
+        "classico": FilterSet(
+            label="⭐  Clássico  (Partes 1-6)",
+            description="Draft padrão, sem arena.",
+            exclude=set(),
+        ),
+        "arena": FilterSet(
+            label="🏟  Arena  (Partes 1-6)",
+            description="Sorteie uma arena que altera o rumo da batalha.",
             exclude=set(),
         ),
     },

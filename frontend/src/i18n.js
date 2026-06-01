@@ -85,6 +85,16 @@ const T = {
     swapHint1:        "SWAP: select first slot to swap",
     swapHint2:        'SWAP: "{slot}" selected — pick second slot',
     cancel:           "CANCEL",
+    // ── Arena ─────────────────────────────────────────────
+    arenaGacha:       "ARENA GACHA",
+    arenaNotRolled:   "NOT ROLLED",
+    arenaRolling:     "ROLLING…",
+    arenaConditions:  "CONDITIONS",
+    arenaBuffs:       "STRENGTHS",
+    arenaDebuffs:     "WEAKNESSES",
+    arenaSpecial:     "SPECIAL EVENT",
+    arenaPart:        "PART",
+    arenaClose:       "CLOSE",
     // ── Result ────────────────────────────────────────────
     draftComplete:    "DRAFT COMPLETE · DEBATE YOUR PICKS",
     rosterWord:       "ROSTER",
@@ -180,6 +190,16 @@ const T = {
     swapHint1:        "SWAP: selecione o primeiro slot para trocar",
     swapHint2:        'SWAP: selecionado "{slot}" — escolha o segundo slot',
     cancel:           "CANCELAR",
+    // ── Arena ─────────────────────────────────────────────
+    arenaGacha:       "GACHA DE ARENA",
+    arenaNotRolled:   "NÃO SORTEADA",
+    arenaRolling:     "SORTEANDO…",
+    arenaConditions:  "CONDIÇÕES",
+    arenaBuffs:       "PONTOS FORTES",
+    arenaDebuffs:     "PONTOS FRACOS",
+    arenaSpecial:     "EVENTO ESPECIAL",
+    arenaPart:        "PARTE",
+    arenaClose:       "FECHAR",
     // ── Result ────────────────────────────────────────────
     draftComplete:    "DRAFT COMPLETO · DEBATA SUAS ESCOLHAS",
     rosterWord:       "ESCALAR",

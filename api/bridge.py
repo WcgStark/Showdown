@@ -6,6 +6,7 @@ import sys
 
 from config.settings import QUICK_NAMES
 from config.universes import ALL_UNIVERSES
+from config.arenas import ARENAS_BY_UNIVERSE
 from application.services.game_service import GameService
 from application.managers.session_manager import SessionManager
 import updater as _updater
@@ -44,6 +45,7 @@ class GameAPI:
                 for f in sorted(music_dir.iterdir()):
                     if f.suffix.lower() in (".mp3", ".ogg", ".wav", ".m4a"):
                         music_urls.append(f"./music/{music_folder}/{f.name}")
+            universe_arenas = ARENAS_BY_UNIVERSE.get(key, [])
             universes.append({
                 "id": key,
                 "name": u.name,
@@ -53,6 +55,9 @@ class GameAPI:
                 "defaultFilter": u.default_filter,
                 "assetFolder": u.asset_folder,
                 "musicUrls": music_urls,
+                "hasArenas": len(universe_arenas) > 0,
+                "arenaNames": [a.name for a in universe_arenas],
+                "arenaList": [{"name": a.name, "image": a.image} for a in universe_arenas],
             })
         _IMG_EXT = {".png", ".jpg", ".jpeg", ".gif", ".webp"}
         # In dev (not frozen) serve from assets/; in production from dist/ (Vite build output)
@@ -97,6 +102,7 @@ class GameAPI:
             filter_key,
             [p1_name or "Player 1", p2_name or "Player 2"],
         )
+        match.arena_enabled = (filter_key == "arena")
         self._session.universe = universe
         self._session.start_match(match)
         self._history = []
@@ -138,6 +144,28 @@ class GameAPI:
     def pass_turn(self) -> dict:
         m = self._session.match
         m.turn = 1 - m.turn
+        return self._game_state()
+
+    def roll_arena(self) -> dict:
+        m = self._session.match
+        if m.arena:
+            return self._game_state()
+        arenas = ARENAS_BY_UNIVERSE.get(m.universe.key, [])
+        if not arenas:
+            return self._game_state()
+        a = random.choice(arenas)
+        m.arena = {
+            "id": a.id,
+            "name": a.name,
+            "flavor": a.flavor,
+            "image": a.image,
+            "conditions": a.conditions,
+            "buffs": a.buffs,
+            "debuffs": a.debuffs,
+            "special": a.special,
+            "part": a.part,
+            "partName": a.part_name,
+        }
         return self._game_state()
 
     def switch_positions(self, pos_a: str, pos_b: str) -> dict:
@@ -205,4 +233,6 @@ class GameAPI:
             "history": self._history,
             "undoAvailable": self._session.undo_state is not None,
             "poolSample": pool_sample,
+            "arena": m.arena,
+            "arenaEnabled": m.arena_enabled,
         }

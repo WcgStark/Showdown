@@ -195,7 +195,7 @@ const AvatarPickerModal = ({ pfpList, tempPfp, setTempPfp, onCancel, onSave, lan
 )
 
 /* ── Player Card ─────────────────────────────────────────────────────────── */
-const PlayerCard = ({ side, value, setValue, align, quickNames, lang, pfp, onOpenPicker, onClearPfp }) => (
+const PlayerCard = ({ side, value, setValue, onQuickNameClick, align, quickNames, lang, pfp, onOpenPicker, onClearPfp }) => (
   <div className="panel panel-tagged" style={{ position: "relative", padding: 28, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
     <CornerTicks />
     <div style={{
@@ -279,7 +279,7 @@ const PlayerCard = ({ side, value, setValue, align, quickNames, lang, pfp, onOpe
       <div className="label" style={{ marginBottom: 10 }}>{t('quickNames', lang)}</div>
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
         {(quickNames || QUICK_NAMES_FALLBACK).map(n => (
-          <button key={n} className="chip" onClick={() => setValue(n)}>{n}</button>
+          <button key={n} className="chip" onClick={() => onQuickNameClick(n)}>{n}</button>
         ))}
         <button className="chip" onClick={() => setValue("")}>
           <Icon name="cross" size={10} /> CLEAR
@@ -298,13 +298,25 @@ const PlayersScreen = ({ universe, mode, setMode, p1, p2, setP1, setP2, onBack, 
 
   const [pickerFor, setPickerFor] = useState(null)
   const [tempPfp,   setTempPfp]   = useState(null)
+  const quickNamePfpMap = useRef({})
 
   const openPicker = side => { setPickerFor(side); setTempPfp(side === "p1" ? p1pfp : p2pfp) }
   const closePicker = () => setPickerFor(null)
   const savePicker  = () => {
+    const currentName = (pickerFor === "p1" ? p1 : p2).trim()
+    if (resolvedQuickNames.includes(currentName)) {
+      quickNamePfpMap.current[currentName] = tempPfp
+    }
     if (pickerFor === "p1") setP1pfp(tempPfp)
     else setP2pfp(tempPfp)
     closePicker()
+  }
+
+  const handleQuickNameClick = (side, name) => {
+    const setter    = side === "p1" ? setP1    : setP2
+    const pfpSetter = side === "p1" ? setP1pfp : setP2pfp
+    setter(name)
+    pfpSetter(quickNamePfpMap.current[name] ?? null)
   }
 
   useEffect(() => {
@@ -341,7 +353,8 @@ const PlayersScreen = ({ universe, mode, setMode, p1, p2, setP1, setP2, onBack, 
         display: "grid", gridTemplateColumns: "1fr 200px 1fr", gap: 28, alignItems: "stretch",
       }}>
         <PlayerCard
-          side="P1" value={p1} setValue={setP1} align="right" quickNames={resolvedQuickNames} lang={lang}
+          side="P1" value={p1} setValue={setP1} onQuickNameClick={n => handleQuickNameClick("p1", n)}
+          align="right" quickNames={resolvedQuickNames} lang={lang}
           pfp={p1pfp} onOpenPicker={() => openPicker("p1")} onClearPfp={() => setP1pfp(null)}
         />
         <div style={{ display: "grid", placeItems: "center", position: "relative" }}>
@@ -352,7 +365,8 @@ const PlayersScreen = ({ universe, mode, setMode, p1, p2, setP1, setP2, onBack, 
           </div>
         </div>
         <PlayerCard
-          side="P2" value={p2} setValue={setP2} align="left" quickNames={resolvedQuickNames} lang={lang}
+          side="P2" value={p2} setValue={setP2} onQuickNameClick={n => handleQuickNameClick("p2", n)}
+          align="left" quickNames={resolvedQuickNames} lang={lang}
           pfp={p2pfp} onOpenPicker={() => openPicker("p2")} onClearPfp={() => setP2pfp(null)}
         />
       </div>

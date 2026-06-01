@@ -15,6 +15,8 @@ class Match:
     players: list[Player] = field(default_factory=list)
     turn: int = 0
     current_char: Optional[str] = None
+    arena: Optional[dict] = None
+    arena_enabled: bool = False
 
     @property
     def current_player(self) -> Player:
