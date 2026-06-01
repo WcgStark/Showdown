@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import random
-from typing import Optional
 
 from config.universes import Universe
 from domain.entities.match import Match
@@ -27,7 +26,7 @@ class GameService:
             players=players,
         )
 
-    def draw_character(self, match: Match) -> Optional[str]:
+    def draw_character(self, match: Match) -> str | None:
         """Pick a random character from the pool. Returns None if not drawable."""
         if match.current_char or match.current_player.all_filled():
             return None
