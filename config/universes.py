@@ -5,7 +5,6 @@ and UI theme used by both the collector and the main app.
 """
 
 from dataclasses import dataclass, field
-from typing import Optional
 
 
 # ──────────────────────────────────────────────

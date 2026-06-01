@@ -89,7 +89,14 @@
       "Bash(git -C \"c:/Users/willi/Downloads/Showdown\" status)",
       "Bash(git -C \"c:/Users/willi/Downloads/Showdown\" log --oneline -3)",
       "Bash(git -C \"c:/Users/willi/Downloads/Showdown\" show HEAD:dev.bat)",
-      "Bash(git -C \"c:/Users/willi/Downloads/Showdown\" show HEAD:collect.bat)"
+      "Bash(git -C \"c:/Users/willi/Downloads/Showdown\" show HEAD:collect.bat)",
+      "Bash(xargs wc -l)",
+      "Bash(python -m py_compile updater.py)",
+      "Bash(python -c \"import pytest; print\\('pytest', pytest.__version__\\)\")",
+      "Bash(python -m pip install pytest --quiet)",
+      "Bash(python -m pytest -q)",
+      "Bash(python -m py_compile updater.py main.py api/bridge.py application/services/game_service.py application/managers/session_manager.py domain/entities/match.py domain/entities/player.py config/universes.py)",
+      "Bash(python -m PyInstaller --noconfirm showdown.spec)"
     ]
   }
 }

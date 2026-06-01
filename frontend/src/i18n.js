@@ -95,6 +95,7 @@ const T = {
     arenaSpecial:     "SPECIAL EVENT",
     arenaPart:        "PART",
     arenaClose:       "CLOSE",
+    arenaFirst:       "ROLL THE ARENA FIRST",
     // ── Result ────────────────────────────────────────────
     draftComplete:    "DRAFT COMPLETE · DEBATE YOUR PICKS",
     rosterWord:       "ROSTER",
@@ -200,6 +201,7 @@ const T = {
     arenaSpecial:     "EVENTO ESPECIAL",
     arenaPart:        "PARTE",
     arenaClose:       "FECHAR",
+    arenaFirst:       "SORTEIE A ARENA PRIMEIRO",
     // ── Result ────────────────────────────────────────────
     draftComplete:    "DRAFT COMPLETO · DEBATA SUAS ESCOLHAS",
     rosterWord:       "ESCALAR",

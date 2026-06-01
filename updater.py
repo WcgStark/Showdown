@@ -8,16 +8,32 @@ import tempfile
 import threading
 import urllib.request
 
-APP_VERSION = "1.2.8"
-# ─── Configure your GitHub repo here ─────────────────────────────────────────
-GITHUB_OWNER = "WcgStark"   # ← substituir pelo seu usuário do GitHub
-GITHUB_REPO  = "Showdown"      # ← substituir pelo nome do repositório
+APP_VERSION = "1.2.9"
+# ─── GitHub repo the auto-updater pulls releases from ────────────────────────
+GITHUB_OWNER = "WcgStark"
+GITHUB_REPO = "Showdown"
 # ─────────────────────────────────────────────────────────────────────────────
 
-_API_URL = f"https://api.github.com/repos/WcgStark/Showdown/releases/latest"
+_API_URL = f"https://api.github.com/repos/{GITHUB_OWNER}/{GITHUB_REPO}/releases/latest"
 
 _state: dict = {"status": "idle", "value": 0, "tmp_path": ""}
 _lock = threading.Lock()
+
+# Diagnostic log for the (notoriously fiddly) self-replace step. On by default
+# because update failures only happen on end-user machines; set the env var to
+# "0" to silence it.
+UPDATE_DEBUG = os.environ.get("SHOWDOWN_UPDATE_DEBUG", "1") != "0"
+_LOG_PATH = os.path.join(tempfile.gettempdir(), "showdown_update.log")
+
+
+def _ulog(msg: str, *, reset: bool = False) -> None:
+    if not UPDATE_DEBUG:
+        return
+    try:
+        with open(_LOG_PATH, "w" if reset else "a", encoding="utf-8") as f:
+            f.write(msg + "\n")
+    except Exception:
+        pass
 
 
 def _set(status: str, value: int = 0, tmp_path: str = "") -> None:
@@ -119,21 +135,17 @@ def apply_update() -> bool:
 
     current_exe = sys.executable
     pid = os.getpid()
-    log_path = os.path.join(tempfile.gettempdir(), "showdown_update.log")
+    log_path = _LOG_PATH
     ps_path  = os.path.join(tempfile.gettempdir(), "showdown_update.ps1")
 
     # Write Python-level diagnostic before touching PowerShell
-    try:
-        with open(log_path, "w", encoding="utf-8") as f:
-            f.write(f"[py] frozen={getattr(sys, 'frozen', False)}\n")
-            f.write(f"[py] pid={pid}\n")
-            f.write(f"[py] tmp_path={tmp_path}\n")
-            f.write(f"[py] tmp_exists={os.path.exists(tmp_path)}\n")
-            f.write(f"[py] current_exe={current_exe}\n")
-            f.write(f"[py] ps_path={ps_path}\n")
-            f.write(f"[py] powershell_exists={os.path.exists(_POWERSHELL)}\n")
-    except Exception:
-        pass
+    _ulog(f"[py] frozen={getattr(sys, 'frozen', False)}", reset=True)
+    _ulog(f"[py] pid={pid}")
+    _ulog(f"[py] tmp_path={tmp_path}")
+    _ulog(f"[py] tmp_exists={os.path.exists(tmp_path)}")
+    _ulog(f"[py] current_exe={current_exe}")
+    _ulog(f"[py] ps_path={ps_path}")
+    _ulog(f"[py] powershell_exists={os.path.exists(_POWERSHELL)}")
 
     ps = (
         f'$appPid = {pid}\n'
@@ -175,16 +187,13 @@ def apply_update() -> bool:
     import ctypes
     ps_args = f'-ExecutionPolicy Bypass -WindowStyle Hidden -File "{ps_path}"'
     try:
-        with open(log_path, "a", encoding="utf-8") as f:
-            f.write(f"[py] launching via ShellExecuteW\n")
+        _ulog("[py] launching via ShellExecuteW")
         ret = ctypes.windll.shell32.ShellExecuteW(None, "open", _POWERSHELL, ps_args, None, 0)
-        with open(log_path, "a", encoding="utf-8") as f:
-            f.write(f"[py] ShellExecuteW returned {ret}\n")
+        _ulog(f"[py] ShellExecuteW returned {ret}")
         if ret <= 32:
             raise RuntimeError(f"ShellExecuteW error code {ret}")
     except Exception as e:
-        with open(log_path, "a", encoding="utf-8") as f:
-            f.write(f"[py] ShellExecuteW FAILED ({e}), falling back to Popen\n")
+        _ulog(f"[py] ShellExecuteW FAILED ({e}), falling back to Popen")
         try:
             subprocess.Popen(
                 [_POWERSHELL, "-ExecutionPolicy", "Bypass", "-WindowStyle", "Hidden", "-File", ps_path],
@@ -195,8 +204,7 @@ def apply_update() -> bool:
                 stderr=subprocess.DEVNULL,
             )
         except Exception as e2:
-            with open(log_path, "a", encoding="utf-8") as f:
-                f.write(f"[py] Popen fallback FAILED: {e2}\n")
+            _ulog(f"[py] Popen fallback FAILED: {e2}")
             return False
 
     return True

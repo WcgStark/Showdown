@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Optional
 
 from config.universes import Universe
 from domain.entities.player import Player
@@ -14,8 +13,8 @@ class Match:
     pool: list[str] = field(default_factory=list)
     players: list[Player] = field(default_factory=list)
     turn: int = 0
-    current_char: Optional[str] = None
-    arena: Optional[dict] = None
+    current_char: str | None = None
+    arena: dict | None = None
     arena_enabled: bool = False
 
     @property

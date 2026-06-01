@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { setUiVolume, setSfxVolume, setMusicVolume, playMusic, stopMusic } from './sounds'
 import { loadKeybinds } from './keybinds'
+import { usePersistedState } from './hooks'
 import LobbyScreen from './screens/LobbyScreen'
 import PlayersScreen from './screens/PlayersScreen'
 import DraftScreen from './screens/DraftScreen'
@@ -42,41 +43,17 @@ const App = () => {
 
   // Two independent channels. Migrate from the old single "hakiVolume" key
   // when the new ones aren't set yet so existing users keep their level.
-  const _legacyVol = localStorage.getItem("hakiVolume")
-  const [uiVolume, setUiVol] = useState(
-    () => parseFloat(localStorage.getItem("hakiUiVolume") ?? _legacyVol ?? "0.9")
-  )
-  const [sfxVolume, setSfxVol] = useState(
-    () => parseFloat(localStorage.getItem("hakiSfxVolume") ?? _legacyVol ?? "0.9")
-  )
-  const [musicVolume, setMusicVol] = useState(
-    () => parseFloat(localStorage.getItem("hakiMusicVolume") ?? "0.5")
-  )
-  useEffect(() => {
-    localStorage.setItem("hakiUiVolume", uiVolume)
-    setUiVolume(uiVolume)
-  }, [uiVolume])
-  useEffect(() => {
-    localStorage.setItem("hakiSfxVolume", sfxVolume)
-    setSfxVolume(sfxVolume)
-  }, [sfxVolume])
-  useEffect(() => {
-    localStorage.setItem("hakiMusicVolume", musicVolume)
-    setMusicVolume(musicVolume)
-  }, [musicVolume])
+  const _legacyVol = parseFloat(localStorage.getItem("hakiVolume") ?? "0.9")
+  const [uiVolume, setUiVol]       = usePersistedState("hakiUiVolume",    _legacyVol, { parse: parseFloat, onChange: setUiVolume })
+  const [sfxVolume, setSfxVol]     = usePersistedState("hakiSfxVolume",   _legacyVol, { parse: parseFloat, onChange: setSfxVolume })
+  const [musicVolume, setMusicVol] = usePersistedState("hakiMusicVolume", 0.5,        { parse: parseFloat, onChange: setMusicVolume })
 
-  const [quality, setQuality] = useState(
-    () => localStorage.getItem("hakiQuality") ?? "rtx"
-  )
-  useEffect(() => { localStorage.setItem("hakiQuality", quality) }, [quality])
-
-  const [lang, setLang] = useState(
-    () => localStorage.getItem("hakiLang") ?? "en"
-  )
-  useEffect(() => { localStorage.setItem("hakiLang", lang) }, [lang])
-
-  const [keybinds, setKeybinds] = useState(loadKeybinds)
-  useEffect(() => { localStorage.setItem("hakiKeybinds", JSON.stringify(keybinds)) }, [keybinds])
+  const [quality, setQuality] = usePersistedState("hakiQuality", "rtx")
+  const [lang, setLang]       = usePersistedState("hakiLang", "en")
+  const [keybinds, setKeybinds] = usePersistedState("hakiKeybinds", loadKeybinds, {
+    parse: () => loadKeybinds(),          // merges stored keys over defaults
+    serialize: JSON.stringify,
+  })
 
   // ── Responsive layout: scale + center the 1920×1080 stage ────────────────
   useEffect(() => {
