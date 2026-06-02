@@ -1,7 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { Atmos, AppBar, SettingsModal } from '../components'
 import { t } from '../i18n'
-import { playNumberOne, playYokosoWatashi, playYhwachEntrance } from '../sounds'
+import {
+  playNumberOne, playYokosoWatashi, playYhwachEntrance, playZankaNTachi,
+  playGoldExperience, playKillerQueen, playKingCrimson, playMadeInHeaven,
+  playNigerundayo, playYareYareDaze, playZaWarudo,
+} from '../sounds'
 import HakiOverlay from './draft/HakiOverlay'
 import ArenaModal from './draft/ArenaModal'
 import ArenaCard from './draft/ArenaCard'
@@ -11,9 +15,19 @@ import PositionColumn from './draft/PositionColumn'
 import ActionPanel from './draft/ActionPanel'
 
 const CHAR_SFX = {
-  "Ichigo Kurosaki": playNumberOne,
-  "Sousuke Aizen":   playYokosoWatashi,
-  "Yhwach":          playYhwachEntrance,
+  // Bleach
+  "Ichigo Kurosaki":              playNumberOne,
+  "Sousuke Aizen":                playYokosoWatashi,
+  "Yhwach":                       playYhwachEntrance,
+  "Genryūsai Shigekuni Yamamoto": playZankaNTachi,
+  // JoJo
+  "Giorno":                       playGoldExperience,
+  "Yoshikage Kira":               playKillerQueen,
+  "Diavolo":                      playKingCrimson,
+  "Pucci":                        playMadeInHeaven,
+  "Joseph Joestar":               playNigerundayo,
+  "Jotaro Kujo":                  playYareYareDaze,
+  "Dio Brando":                   playZaWarudo,
 }
 
 // Placeholder names shown on the gacha reel when the real pool is too small.
@@ -48,18 +62,26 @@ const DraftScreen = ({
   const [reelChars, setReelChars] = useState([])
 
   const [hakiActive, setHakiActive] = useState(false)
+  const [shake, setShake] = useState(false)
+  const shakeTimer = useRef(null)
 
   const prevSpinning = useRef(false)
   useEffect(() => {
     if (prevSpinning.current && !spinning) {
-      if (draft?.currentChar?.ext === "gif" && universe.id === "onepiece") {
-        setHakiActive(true)
+      if (draft?.currentChar?.ext === "gif") {
+        // Any universe: shake the whole screen when a GIF character is pulled.
+        setShake(true)
+        clearTimeout(shakeTimer.current)
+        shakeTimer.current = setTimeout(() => setShake(false), 1300)
+        if (universe.id === "onepiece") setHakiActive(true)
       }
       const sfx = CHAR_SFX[draft?.currentChar?.name]
       if (sfx) sfx()
     }
     prevSpinning.current = spinning
   }, [spinning, draft?.currentChar?.ext, draft?.currentChar?.name])
+
+  useEffect(() => () => clearTimeout(shakeTimer.current), [])
 
   const [switchMode, setSwitchMode] = useState(false)
   const [switchFirst, setSwitchFirst] = useState(null)
@@ -167,7 +189,8 @@ const DraftScreen = ({
       } else if (e.code === keybinds.skip) {
         if (draft.currentChar && skipsLeft > 0 && !spinning) { e.preventDefault(); onSkip() }
       } else if (e.code === keybinds.pass) {
-        if (!draft.currentChar && !switchMode && !spinning) { e.preventDefault(); handlePass() }
+        const myFilled = draft.turn === "p1" ? filledP1 : filledP2
+        if (!draft.currentChar && !switchMode && !spinning && myFilled >= positions.length) { e.preventDefault(); handlePass() }
       } else if (e.code === keybinds.switch) {
         if (!draft.currentChar && !switchMode && myFilled >= 2 && !spinning) { e.preventDefault(); handleSwitch() }
       } else if (e.code === keybinds.undo) {
@@ -181,7 +204,7 @@ const DraftScreen = ({
   }, [keybinds, draft, spinning, switchMode, settingsOpen, filledP1, filledP2, allDone])
 
   return (
-    <div className={`stage acc-${universe.id}`} data-screen-label="03 Draft">
+    <div className={`stage acc-${universe.id}${shake ? " shake-screen" : ""}`} data-screen-label="03 Draft">
       <Atmos particles={false} grid={true} />
       <AppBar phase="DRAFTING" universe={universe} mode={mode} step={`${totalPicks} / ${positions.length * 2}`} version={version} lang={lang} />
 
@@ -264,6 +287,7 @@ const DraftScreen = ({
         universe={universe}
         draft={draft}
         spinning={spinning}
+        shake={shake}
         reelChars={reelChars}
         onSpin={spin}
         onSkip={onSkip}

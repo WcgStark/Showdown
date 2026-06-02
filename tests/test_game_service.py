@@ -6,11 +6,19 @@ import random
 import pytest
 
 from application.services.game_service import GameService
-from config.universes import ONEPIECE
+from config.universes import ONEPIECE, BLEACH, JOJO
 
-# The "teste" filter narrows One Piece down to exactly these three, which keeps
-# the pool small and predictable for assertions.
-TESTE_POOL = {"Monkey D. Luffy", "Monkey D. Garp", "Edward Newgate"}
+TESTE_POOL_OP = {"Monkey D. Luffy", "Monkey D. Garp", "Edward Newgate"}
+
+TESTE_POOL_BLEACH = {
+    "Ichigo Kurosaki", "Sousuke Aizen", "Yhwach",
+    "Genryūsai Shigekuni Yamamoto",
+}
+
+TESTE_POOL_JOJO = {
+    "Giorno", "Yoshikage Kira", "Diavolo", "Pucci",
+    "Joseph Joestar", "Jotaro Kujo", "Dio Brando",
+}
 
 
 @pytest.fixture
@@ -20,14 +28,34 @@ def service() -> GameService:
 
 @pytest.fixture
 def match(service: GameService):
-    random.seed(0)  # deterministic shuffle/choice
+    random.seed(0)
     return service.create_match(ONEPIECE, "teste", ["P1", "P2"])
+
+
+@pytest.fixture
+def match_bleach(service: GameService):
+    random.seed(0)
+    return service.create_match(BLEACH, "teste", ["P1", "P2"])
+
+
+@pytest.fixture
+def match_jojo(service: GameService):
+    random.seed(0)
+    return service.create_match(JOJO, "teste", ["P1", "P2"])
 
 
 # ── create_match ────────────────────────────────────────────────────────────
 
 def test_create_match_applies_filter(match):
-    assert set(match.pool) == TESTE_POOL
+    assert set(match.pool) == TESTE_POOL_OP
+
+
+def test_create_match_bleach_applies_filter(match_bleach):
+    assert set(match_bleach.pool) == TESTE_POOL_BLEACH
+
+
+def test_create_match_jojo_applies_filter(match_jojo):
+    assert set(match_jojo.pool) == TESTE_POOL_JOJO
 
 
 def test_create_match_initializes_players(match):
@@ -43,7 +71,7 @@ def test_create_match_initializes_players(match):
 
 def test_draw_character_sets_current(service, match):
     char = service.draw_character(match)
-    assert char in TESTE_POOL
+    assert char in TESTE_POOL_OP
     assert match.current_char == char
 
 

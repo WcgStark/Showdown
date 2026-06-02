@@ -4,7 +4,7 @@ import pathlib
 import random
 import sys
 
-from config.settings import QUICK_NAMES
+from config.quicknames import QUICK_NAMES
 from config.universes import ALL_UNIVERSES
 from config.arenas import ARENAS_BY_UNIVERSE
 from application.services.game_service import GameService

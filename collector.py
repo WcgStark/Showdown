@@ -98,6 +98,7 @@ def _resolve_image(api_url: str, name: str) -> str | None:
     return None
 
 
+
 def _download(url: str, dest: pathlib.Path) -> None:
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     with urllib.request.urlopen(req, timeout=60) as resp:
@@ -122,6 +123,10 @@ def collect_universe(key: str) -> None:
     not_found: list[str] = []
 
     for name in universe.characters:
+        if name in universe.collector_skip:
+            print(f"    [skip] {name}  (ignorado para coleta manual)")
+            skipped += 1
+            continue
         if _already_has_image(folder, name):
             skipped += 1
             continue

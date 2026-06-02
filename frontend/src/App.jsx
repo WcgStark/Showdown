@@ -13,6 +13,7 @@ const UNIVERSE_UI = {
   bleach:     { codename: "GOTEI" },
   invincible: { codename: "VILTRUM" },
   jojo:       { codename: "STARDUST" },
+  jujutsu:    { codename: "JUJUTSU HIGH" },
 }
 
 const enrichUniverse = u => ({
@@ -52,6 +53,13 @@ const App = () => {
   const [lang, setLang]       = usePersistedState("hakiLang", "en")
   const [keybinds, setKeybinds] = usePersistedState("hakiKeybinds", loadKeybinds, {
     parse: () => loadKeybinds(),          // merges stored keys over defaults
+    serialize: JSON.stringify,
+  })
+
+  // name → avatar map. Stored in localStorage (which lives outside the install
+  // dir), so a player's chosen pfp survives closing the game *and* updates.
+  const [pfpMap, setPfpMap] = usePersistedState("hakiPfpMap", {}, {
+    parse: raw => { try { return JSON.parse(raw) } catch { return {} } },
     serialize: JSON.stringify,
   })
 
@@ -280,6 +288,8 @@ const App = () => {
             setP1pfp={setP1pfp}
             p2pfp={p2pfp}
             setP2pfp={setP2pfp}
+            pfpMap={pfpMap}
+            setPfpMap={setPfpMap}
             pfpList={config.pfpList || []}
             onBack={() => setScreen("lobby")}
             onStart={handleStartGame}

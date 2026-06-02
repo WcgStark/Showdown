@@ -8,7 +8,7 @@ import tempfile
 import threading
 import urllib.request
 
-APP_VERSION = "1.2.9"
+APP_VERSION = "1.3.0"
 # ─── GitHub repo the auto-updater pulls releases from ────────────────────────
 GITHUB_OWNER = "WcgStark"
 GITHUB_REPO = "Showdown"

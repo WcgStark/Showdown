@@ -20,9 +20,12 @@ const ActionBtn = ({ icon, label, hint, onClick, disabled, primary, fullWidth })
 
 /* ── Right action panel (current pick + controls) ────────────────────────── */
 const ActionPanel = ({
-  universe, draft, spinning, reelChars, onSpin, onSkip, onUndo, onSwitch, onReady,
+  universe, draft, spinning, shake, reelChars, onSpin, onSkip, onUndo, onSwitch, onReady,
   ready, imgUrl, onMenu, onPlayers, onPass, onSettings, switchActive, lang, keybinds,
 }) => {
+  // When a GIF is pulled the whole stage shakes; counter-animate this portrait
+  // so the pulled character stays still in the middle of the rattle.
+  const cancelShake = shake && draft.currentChar?.ext === "gif"
   const turnLabel = draft.turn === "p1" ? "PLAYER 01" : "PLAYER 02"
   const skipsLeft = draft.turn === "p1" ? draft.skipsP1 : draft.skipsP2
   const myFilled = draft.turn === "p1"
@@ -50,7 +53,7 @@ const ActionPanel = ({
         </div>
 
         {/* Portrait area */}
-        <div style={{ position: "relative", marginTop: 14, height: 280, overflow: "hidden" }}>
+        <div className={cancelShake ? "shake-cancel" : undefined} style={{ position: "relative", marginTop: 14, height: 280, overflow: "hidden" }}>
           {spinning && reelChars.length > 0 && (
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(7,8,12,1) 0%, transparent 20%, transparent 80%, rgba(7,8,12,1) 100%)", zIndex: 2, pointerEvents: "none" }} />
           )}
@@ -143,7 +146,7 @@ const ActionPanel = ({
         <ActionBtn icon="skip" label={t('skip', lang)} hint={codeLabel(keybinds.skip)}
           onClick={onSkip} disabled={!draft.currentChar || skipsLeft <= 0 || spinning} />
         <ActionBtn icon="arrow" label={t('pass', lang)} hint={codeLabel(keybinds.pass)}
-          onClick={onPass} disabled={!!draft.currentChar || switchActive || spinning} />
+          onClick={onPass} disabled={!!draft.currentChar || switchActive || spinning || myFilled < totalPositions} />
         <ActionBtn icon="swap" label={t('switch', lang)} hint={codeLabel(keybinds.switch)}
           onClick={onSwitch} disabled={!!draft.currentChar || switchActive || myFilled < 2 || spinning} />
         <ActionBtn icon="undo" label={t('undo', lang)} hint={codeLabel(keybinds.undo)}

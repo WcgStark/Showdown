@@ -9,7 +9,8 @@ const LANDSCAPE = {
   naruto:     "./landscape/landscape%20naruto.jpg",
   bleach:     "./landscape/landscape%20bleach.jpg",
   invincible: "./landscape/landscape%20invincible.jpg",
-  jojo:       "./landscape/jojo%20landscape.jpg",
+  jojo:       "./landscape/landscape%20jojo.jpg",
+  jujutsu:    "./landscape/landscape%20jujutsu.jpg",
 }
 
 const UniverseCard = ({ universe, active, onHover, onClick }) => {

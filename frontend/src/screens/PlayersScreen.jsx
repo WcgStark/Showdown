@@ -290,7 +290,7 @@ const PlayerCard = ({ side, value, setValue, onQuickNameClick, align, quickNames
 )
 
 /* ── Players Screen ──────────────────────────────────────────────────────── */
-const PlayersScreen = ({ universe, mode, setMode, p1, p2, setP1, setP2, onBack, onStart, quickNames, version, lang, keybinds, p1pfp, setP1pfp, p2pfp, setP2pfp, pfpList }) => {
+const PlayersScreen = ({ universe, mode, setMode, p1, p2, setP1, setP2, onBack, onStart, quickNames, version, lang, keybinds, p1pfp, setP1pfp, p2pfp, setP2pfp, pfpMap, setPfpMap, pfpList }) => {
   const resolvedQuickNames = (quickNames && quickNames.length)
     ? quickNames.map(n => n.toUpperCase())
     : QUICK_NAMES_FALLBACK
@@ -298,26 +298,52 @@ const PlayersScreen = ({ universe, mode, setMode, p1, p2, setP1, setP2, onBack, 
 
   const [pickerFor, setPickerFor] = useState(null)
   const [tempPfp,   setTempPfp]   = useState(null)
-  const quickNamePfpMap = useRef({})
+
+  // The avatar is bound to the (trimmed, upper-cased) player name. The map is
+  // persisted, so re-entering a name later restores its avatar.
+  const nameKey = name => name.trim().toUpperCase()
+  const pfpForName = name => {
+    const k = nameKey(name)
+    return k && pfpMap[k] ? pfpMap[k] : null
+  }
+  const storePfpForName = (name, pfp) => {
+    const k = nameKey(name)
+    if (!k) return
+    setPfpMap(prev => {
+      const next = { ...prev }
+      if (pfp) next[k] = pfp
+      else delete next[k]
+      return next
+    })
+  }
+
+  // Set a player's name and pull in whatever avatar is stored for it.
+  const setName = (side, raw) => {
+    const name = raw.slice(0, 14).toUpperCase()
+    ;(side === "p1" ? setP1 : setP2)(name)
+    ;(side === "p1" ? setP1pfp : setP2pfp)(pfpForName(name))
+  }
+
+  // Restore stored avatars on mount / when names arrive pre-filled.
+  useEffect(() => { if (p1) setP1pfp(pfpForName(p1)) }, [])
+  useEffect(() => { if (p2) setP2pfp(pfpForName(p2)) }, [])
 
   const openPicker = side => { setPickerFor(side); setTempPfp(side === "p1" ? p1pfp : p2pfp) }
   const closePicker = () => setPickerFor(null)
   const savePicker  = () => {
-    const currentName = (pickerFor === "p1" ? p1 : p2).trim()
-    if (resolvedQuickNames.includes(currentName)) {
-      quickNamePfpMap.current[currentName] = tempPfp
-    }
+    const currentName = pickerFor === "p1" ? p1 : p2
+    storePfpForName(currentName, tempPfp)
     if (pickerFor === "p1") setP1pfp(tempPfp)
     else setP2pfp(tempPfp)
     closePicker()
   }
 
-  const handleQuickNameClick = (side, name) => {
-    const setter    = side === "p1" ? setP1    : setP2
-    const pfpSetter = side === "p1" ? setP1pfp : setP2pfp
-    setter(name)
-    pfpSetter(quickNamePfpMap.current[name] ?? null)
+  const clearPfp = side => {
+    ;(side === "p1" ? setP1pfp : setP2pfp)(null)
+    storePfpForName(side === "p1" ? p1 : p2, null)
   }
+
+  const handleQuickNameClick = (side, name) => setName(side, name)
 
   useEffect(() => {
     const onKey = e => {
@@ -353,9 +379,9 @@ const PlayersScreen = ({ universe, mode, setMode, p1, p2, setP1, setP2, onBack, 
         display: "grid", gridTemplateColumns: "1fr 200px 1fr", gap: 28, alignItems: "stretch",
       }}>
         <PlayerCard
-          side="P1" value={p1} setValue={setP1} onQuickNameClick={n => handleQuickNameClick("p1", n)}
+          side="P1" value={p1} setValue={v => setName("p1", v)} onQuickNameClick={n => handleQuickNameClick("p1", n)}
           align="right" quickNames={resolvedQuickNames} lang={lang}
-          pfp={p1pfp} onOpenPicker={() => openPicker("p1")} onClearPfp={() => setP1pfp(null)}
+          pfp={p1pfp} onOpenPicker={() => openPicker("p1")} onClearPfp={() => clearPfp("p1")}
         />
         <div style={{ display: "grid", placeItems: "center", position: "relative" }}>
           <div style={{ position: "relative", textAlign: "center" }}>
@@ -365,9 +391,9 @@ const PlayersScreen = ({ universe, mode, setMode, p1, p2, setP1, setP2, onBack, 
           </div>
         </div>
         <PlayerCard
-          side="P2" value={p2} setValue={setP2} onQuickNameClick={n => handleQuickNameClick("p2", n)}
+          side="P2" value={p2} setValue={v => setName("p2", v)} onQuickNameClick={n => handleQuickNameClick("p2", n)}
           align="left" quickNames={resolvedQuickNames} lang={lang}
-          pfp={p2pfp} onOpenPicker={() => openPicker("p2")} onClearPfp={() => setP2pfp(null)}
+          pfp={p2pfp} onOpenPicker={() => openPicker("p2")} onClearPfp={() => clearPfp("p2")}
         />
       </div>
 

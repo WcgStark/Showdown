@@ -49,6 +49,7 @@ class Universe:
     theme: Theme
     filters: dict = field(default_factory=dict)  # name -> FilterSet
     default_filter: str = "default"
+    collector_skip: set = field(default_factory=set)  # skip these names in collector
 
 
 # ──────────────────────────────────────────────
@@ -189,7 +190,7 @@ _OP_CHARACTERS = [
     "Benn Beckman", "Lucky Roux", "Yasopp", "Monkey D. Dragon",
     "Nerona Imu", "Rocks D. Xebec", "Figarland Shamrock", "Satchels Maffey",
     "Rimoshifu Killingham", "Shepherd Sommers", "Manmayer Gunko", "Harald", "Ryu",
-    "Dracule Mihawk", "Candelle", "Zaza",
+    "Dracule Mihawk", "Candelle", "Zaza", "Douglas Bullet"
 ]
 
 _OP_SPOILERS_MANGA = {
@@ -238,8 +239,8 @@ ONEPIECE = Universe(
             exclude=_OP_POST_WANO,
         ),
         "teste": FilterSet(
-            label="🧪  Teste  (Luffy, Garp, Newgate)",
-            description="Pool de teste com apenas 3 personagens.",
+            label="🧪  Teste",
+            description="Pool de teste reduzido.",
             exclude=set(_OP_CHARACTERS) - {"Monkey D. Luffy", "Monkey D. Garp", "Edward Newgate"},
         ),
     },
@@ -278,8 +279,8 @@ INVINCIBLE = Universe(
             exclude=set(),
         ),
         "teste": FilterSet(
-            label="🧪  Teste  (Invincible, Omni-Man, Thragg)",
-            description="Pool de teste com apenas Invincible, Omni-Man e Thragg.",
+            label="🧪  Teste",
+            description="Pool de teste reduzido.",
             exclude=set(_INV_CHARACTERS) - {"Invincible", "Omni-Man", "Thragg"},
         ),
     },
@@ -450,10 +451,11 @@ BLEACH = Universe(
             exclude=_BLEACH_TYBW_ONLY,
         ),
         "teste": FilterSet(
-            label="🧪  Teste  (Ichigo, Aizen, Yhwach)",
-            description="Pool de teste com apenas Ichigo, Aizen e Yhwach.",
+            label="🧪  Teste",
+            description="Pool de teste reduzido.",
             exclude=set(_BLEACH_CHARACTERS) - {
                 "Ichigo Kurosaki", "Sousuke Aizen", "Yhwach",
+                "Genryūsai Shigekuni Yamamoto",
             },
         ),
     },
@@ -480,7 +482,7 @@ _JOJO_CHARACTERS = [
     "ZZ", "Steely Dan", "Arabia Fats", "Mannish Boy", "Forever", "Cameo",
     "Midler", "Oingo", "Boingo", "Anubis", "Mariah", "Alessi",
     # Parte 4 — Diamond is Unbreakable
-    "Josuke", "Koichi", "Okuyasu", "Rohan", "Kira",
+    "Josuke", "Koichi", "Okuyasu", "Rohan", "Yoshikage Kira",
     "Yukako", "Shigechi", "Akira Otoishi", "Angelo",
     "Keicho Nijimura", "Toshikazu Hazamada", "Tamami Kobayashi",
     "Ken Oyanagi", "Terunosuke Miyamoto", "Toyohiro Kanedaichi",
@@ -490,7 +492,7 @@ _JOJO_CHARACTERS = [
     "Diavolo", "Risotto", "Prosciutto", "Pesci", "Ghiaccio",
     "Cioccolata", "Secco",
     "Polpo", "Mario Zucchero", "Sale", "Formaggio", "Illuso", "Melone",
-    "Squalo", "Tiziano", "Carne",
+    "Squalo", "Tiziano", "Carne", "Trish Una",
     # Parte 6 — Stone Ocean
     "Jolyne", "Hermes", "Anasui", "Weather Report", "Foo Fighters",
     "Pucci", "Johngalli A", "Gwess", "Lang Rangler", "Sports Maxx",
@@ -519,7 +521,89 @@ JOJO = Universe(
             description="Sorteie uma arena que altera o rumo da batalha.",
             exclude=set(),
         ),
+        "teste": FilterSet(
+            label="🧪  Teste",
+            description="Pool de teste reduzido.",
+            exclude=set(_JOJO_CHARACTERS) - {
+                "Giorno", "Yoshikage Kira", "Diavolo", "Pucci",
+                "Joseph Joestar", "Jotaro Kujo", "Dio Brando",
+            },
+        ),
     },
+)
+
+
+# ──────────────────────────────────────────────
+# Jujutsu Kaisen
+# ──────────────────────────────────────────────
+
+def _build_jujutsu_theme() -> Theme:
+    return Theme(
+        bg="#080810",
+        panel_bg="#10101E",
+        border="#FF6B9D",
+        title_fg="#FF6B9D",
+        text_fg="#FFD6E8",
+        text_secondary="#B89BAD",
+        button_start_bg="#C0325A",
+        button_start_fg="white",
+        font_family="Arial",
+        icon="呪",
+        entry_bg="#0E0E1A",
+        entry_fg="#FFD6E8",
+        entry_insert="#FF6B9D",
+    )
+
+
+_JUJUTSU_CHARACTERS = [
+    # Protagonistas
+    "Yuji Itadori", "Megumi Fushiguro", "Nobara Kugisaki",
+    # Professores e feiticeiros de Tokyo
+    "Satoru Gojo", "Kento Nanami", "Shoko Ieiri", "Masamichi Yaga",
+    # Alunos Tokyo
+    "Maki Zenin", "Toge Inumaki", "Panda",
+    # Alunos Kyoto
+    "Aoi Todo", "Mai Zenin", "Kasumi Miwa", "Noritoshi Kamo",
+    "Mechamaru", "Momo Nishimiya",
+    # Aliados
+    "Yuta Okkotsu", "Mei Mei", "Ui Ui", "Naobito Zenin", "Naoya Zenin", "Choso",
+    # Vilões — Maldições
+    "Ryomen Sukuna", "Mahito", "Jogo", "Hanami", "Dagon",
+    # Vilões — Usuários de Jujutsu
+    "Suguru Geto", "Haruta Shigemo", "Toji Fushiguro",
+    # Culling Game (parcial)
+    "Kirara Hoshi", "Higuruma Hiromi", "Reggie Star", "Remi", "Ryu Ishigori", "Takako Uro",
+    # Outros
+    "Junpei Yoshino", "Riko Amanai", "Misato Kuroi",
+    # Força incerta — comentados até decidir posição no draft
+    # "Yuki Tsukumo", "Takaba Fumihiko", "Hajime Kashimo",
+    # "Kinji Hakari", "Kenjaku", "Uraume",
+]
+
+JUJUTSU = Universe(
+    key="jujutsu",
+    name="Jujutsu Kaisen",
+    api_url="https://jujutsu-kaisen.fandom.com/api.php",
+    asset_folder="assets/jujutsu",
+    characters=_JUJUTSU_CHARACTERS,
+    positions=POSITIONS_STANDARD,
+    theme=_build_jujutsu_theme(),
+    default_filter="completo",
+    filters={
+        "completo": FilterSet(
+            label="呪  Completo  (Anime até Culling Game)",
+            description="Todos os personagens até metade do Jogo do Abate.",
+            exclude=set(),
+        ),
+        "teste": FilterSet(
+            label="🧪  Teste",
+            description="Pool de teste reduzido.",
+            exclude=set(_JUJUTSU_CHARACTERS) - {
+                "Yuji Itadori", "Satoru Gojo", "Megumi Fushiguro", "Ryomen Sukuna",
+            },
+        ),
+    },
+    collector_skip={"Ryomen Sukuna"},
 )
 
 
@@ -529,8 +613,9 @@ JOJO = Universe(
 
 ALL_UNIVERSES: dict[str, Universe] = {
     "onepiece":   ONEPIECE,
-    "invincible": INVINCIBLE,
-    "naruto":     NARUTO,
     "bleach":     BLEACH,
+    "naruto":     NARUTO,
+    "invincible": INVINCIBLE,
     "jojo":       JOJO,
+    "jujutsu":    JUJUTSU,
 }

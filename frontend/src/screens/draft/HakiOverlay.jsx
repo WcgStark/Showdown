@@ -8,7 +8,7 @@ const HAKI_OY = 272  // panel top 80 + padding 18 + label ~20 + marginTop 14 + p
 const HakiOverlay = ({ onComplete, sfxVolume = 0.9 }) => {
   useEffect(() => {
     const audio = new Audio(
-      "./sounds/Monkey%20D%20Luffy%20Haki%20Sound%20%20One%20Piece.mp3"
+      "./sfx/one%20piece/Monkey%20D%20Luffy%20Haki%20Sound%20%20One%20Piece.mp3"
     )
     audio.volume = Math.max(0, Math.min(1, sfxVolume))
     audio.play().catch(() => {})
