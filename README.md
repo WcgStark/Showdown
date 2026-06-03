@@ -1,73 +1,72 @@
 # Showdown Draft
 
-App de desktop (Windows) para draft de personagens entre dois jogadores, por universo
-(One Piece, Naruto, Bleach, Invincible, JoJo). Frontend em React + Vite, empacotado
-num executável standalone com pywebview + PyInstaller.
+Desktop app (Windows) for drafting characters between two players, organized by universe
+(One Piece, Naruto, Bleach, Invincible, JoJo, JJK). Frontend built with React + Vite, packaged
+into a standalone executable using pywebview + PyInstaller.
 
-## Arquitetura
+## Architecture
 
 ```
-api/            # Bridge entre o frontend (JS) e o backend (Python) via pywebview
-application/    # Casos de uso: GameService (regras de draft) + SessionManager (estado)
-domain/         # Entidades puras: Match, Player, e regras de matchmaking
-config/         # Universos, arenas e settings (fonte única de dados)
-frontend/       # App React (telas, componentes, i18n, sons, keybinds)
-updater.py      # Auto-update via releases do GitHub
-main.py         # Entry point — cria a janela pywebview
+api/            # Bridge between frontend (JS) and backend (Python) via pywebview
+application/    # Use cases: GameService (draft rules) + SessionManager (state)
+domain/         # Pure entities: Match, Player, and matchmaking rules
+config/         # Universes, arenas, and settings (single source of truth)
+frontend/       # React app (screens, components, i18n, sounds, keybinds)
+updater.py      # Auto-update via GitHub releases
+main.py         # Entry point — creates the pywebview window
 ```
 
-## Modo dev (testar sem buildar)
+## Dev mode (run without building)
 
 ```
 dev.bat
 ```
 
-Sobe o servidor Vite (frontend) e abre o app apontando para `localhost:5173`.
-Mudanças no frontend aparecem automaticamente, sem reiniciar. Para parar, feche a janela.
+Starts the Vite server (frontend) and opens the app pointing to `localhost:5173`.
+Frontend changes are applied automatically, without restarting. To stop, close the window.
 
-**Requisitos (instalar uma vez):**
+**Requirements (install once):**
 
 ```
 pip install pywebview pyinstaller
 cd frontend && npm install
 ```
 
-## Build (gerar o .exe)
+## Build (generate the .exe)
 
 ```
 build.bat
 ```
 
-1. Builda o frontend (`npm run build`) → gera `dist/`
-2. Empacota tudo com PyInstaller → gera `dist/ShowdownDraft.exe`
+1. Builds the frontend (`npm run build`) → generates `dist/`
+2. Packages everything with PyInstaller → generates `dist/ShowdownDraft.exe`
 
-O `.exe` é standalone — não precisa de Python instalado.
+The `.exe` is standalone — no Python installation required.
 
-## Lançar uma release
+## Release deployment
 
 ```
 release.bat 1.2.9
 ```
 
-Faz **tudo localmente** e publica no GitHub (não há GitHub Actions; o build do `.exe`
-roda na sua máquina):
+Runs **everything locally** and publishes to GitHub (there are no GitHub Actions; the `.exe`
+build runs on your machine):
 
-1. Atualiza a versão em `updater.py` (`_set_version.py`)
-2. Builda frontend + `.exe`
-3. Commita, faz push e cria a release com `gh release create`
+1. Updates the version in `updater.py` (`_set_version.py`)
+2. Builds frontend + `.exe`
+3. Commits, pushes, and creates the release with `gh release create`
 
-Os jogadores que abrirem o app veem o banner de atualização automaticamente e
-instalam com um clique.
+Players who open the app automatically see the update banner and can install it with one click.
 
-## Testes
+## Tests
 
 ```
 python -m pytest
 ```
 
-Cobre a lógica de draft do `GameService` (draw / assign / skip / switch / undo).
+Covers the draft logic in `GameService` (draw / assign / skip / switch / undo).
 
-## Fluxo do dia a dia
+## Daily workflow
 
-- Mexeu no código? → `commit.bat` (ou `git add . && git commit -m "..." && git push`)
-- Quer que os jogadores recebam a versão nova? → `release.bat 1.X.X`
+- Changed code? → `commit.bat` (or `git add . && git commit -m "..." && git push`)
+- Want players to receive the new version? → `release.bat 1.X.X`
