@@ -129,6 +129,46 @@ export const playZaWarudo = () => {
   } catch {}
 }
 
+export const playGojoRyoiki = () => {
+  try {
+    const a = new Audio(sfx(enc('jujutsu/Gojo - Ryoiki tenkai.mp3')))
+    a.volume = clamp(_sfxVol)
+    a.play().catch(() => {})
+  } catch {}
+}
+
+export const playSukunaRyoiki = () => {
+  try {
+    const a = new Audio(sfx(enc('jujutsu/Sukuna - Ryoiki tenkai.mp3')))
+    a.volume = clamp(_sfxVol)
+    a.play().catch(() => {})
+  } catch {}
+}
+
+export const playHigurumaRyoiki = () => {
+  try {
+    const a = new Audio(sfx(enc('jujutsu/Higuruma - Ryoiki tenkai.mp3')))
+    a.volume = clamp(_sfxVol)
+    a.play().catch(() => {})
+  } catch {}
+}
+
+export const playMegumiRyoiki = () => {
+  try {
+    const a = new Audio(sfx(enc('jujutsu/Megumi - Ryoiki tenkai.mp3')))
+    a.volume = clamp(_sfxVol)
+    a.play().catch(() => {})
+  } catch {}
+}
+
+export const playYutaRika = () => {
+  try {
+    const a = new Audio(sfx(enc('jujutsu/Yuta - Rika.mp3')))
+    a.volume = clamp(_sfxVol)
+    a.play().catch(() => {})
+  } catch {}
+}
+
 export const playMusic = (urls) => {
   if (!urls || urls.length === 0) { stopMusic(); return }
   const url = urls[Math.floor(Math.random() * urls.length)]

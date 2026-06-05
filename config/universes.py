@@ -241,7 +241,7 @@ ONEPIECE = Universe(
         "teste": FilterSet(
             label="🧪  Teste",
             description="Pool de teste reduzido.",
-            exclude=set(_OP_CHARACTERS) - {"Monkey D. Luffy", "Monkey D. Garp", "Edward Newgate"},
+            exclude=set(_OP_CHARACTERS) - {"Monkey D. Luffy", "Edward Newgate"},
         ),
     },
 )
@@ -599,7 +599,8 @@ JUJUTSU = Universe(
             label="🧪  Teste",
             description="Pool de teste reduzido.",
             exclude=set(_JUJUTSU_CHARACTERS) - {
-                "Yuji Itadori", "Satoru Gojo", "Megumi Fushiguro", "Ryomen Sukuna",
+                "Satoru Gojo", "Megumi Fushiguro", "Ryomen Sukuna",
+                "Higuruma Hiromi", "Yuta Okkotsu",
             },
         ),
     },

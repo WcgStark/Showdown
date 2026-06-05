@@ -5,6 +5,8 @@ import {
   playNumberOne, playYokosoWatashi, playYhwachEntrance, playZankaNTachi,
   playGoldExperience, playKillerQueen, playKingCrimson, playMadeInHeaven,
   playNigerundayo, playYareYareDaze, playZaWarudo,
+  playGojoRyoiki, playSukunaRyoiki,
+  playHigurumaRyoiki, playMegumiRyoiki, playYutaRika,
 } from '../sounds'
 import HakiOverlay from './draft/HakiOverlay'
 import ArenaModal from './draft/ArenaModal'
@@ -28,6 +30,12 @@ const CHAR_SFX = {
   "Joseph Joestar":               playNigerundayo,
   "Jotaro Kujo":                  playYareYareDaze,
   "Dio Brando":                   playZaWarudo,
+  // Jujutsu Kaisen
+  "Satoru Gojo":                  playGojoRyoiki,
+  "Ryomen Sukuna":                playSukunaRyoiki,
+  "Higuruma Hiromi":              playHigurumaRyoiki,
+  "Megumi Fushiguro":             playMegumiRyoiki,
+  "Yuta Okkotsu":                 playYutaRika,
 }
 
 // Placeholder names shown on the gacha reel when the real pool is too small.
