@@ -19,6 +19,7 @@ main.py         # Entry point — creates the pywebview window
 ## Usage
 
 The app runs by simply executing `ShowdownDraft.exe` — no installation or Python required.
+> 📦 **[Download the latest release](https://github.com/WcgStark/ShowdownDraft/releases)** — grab the `.exe` directly without building anything.
 
 If you want to modify the code, read the sections below.
 
