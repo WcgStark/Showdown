@@ -16,6 +16,13 @@ updater.py      # Auto-update via GitHub releases
 main.py         # Entry point — creates the pywebview window
 ```
 
+## Usage
+
+The app runs by simply executing `ShowdownDraft.exe` — no installation or Python required.
+
+If you want to modify the code, read the sections below.
+
+---
 ## Dev mode (run without building)
 
 ```
