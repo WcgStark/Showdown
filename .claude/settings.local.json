@@ -96,7 +96,11 @@
       "Bash(python -m pip install pytest --quiet)",
       "Bash(python -m pytest -q)",
       "Bash(python -m py_compile updater.py main.py api/bridge.py application/services/game_service.py application/managers/session_manager.py domain/entities/match.py domain/entities/player.py config/universes.py)",
-      "Bash(python -m PyInstaller --noconfirm showdown.spec)"
+      "Bash(python -m PyInstaller --noconfirm showdown.spec)",
+      "Bash(python -c \"import updater; print\\(updater.APP_VERSION\\)\")",
+      "Bash(python -c \"import pathlib; p=pathlib.Path\\(r'c:\\\\Users\\\\willi\\\\Downloads\\\\Showdown\\\\assets'\\); print\\(list\\(p.glob\\('**/*.gif'\\)\\)\\); print\\(list\\(p.glob\\('sfx/**/*.mp3'\\)\\)\\)\")",
+      "Bash(git checkout *)",
+      "Bash(python -c \"import sys; sys.stdout.reconfigure\\(encoding='utf-8'\\); import updater; print\\(updater.APP_VERSION\\)\")"
     ]
   }
 }

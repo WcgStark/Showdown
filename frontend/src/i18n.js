@@ -104,6 +104,11 @@ const T = {
     undrafted:        "UNDRAFTED",
     newDraft:         "NEW DRAFT",
     slots:            "SLOTS",
+    battleAnalysis:   "BATTLE READ",
+    powerIndex:       "POWER INDEX",
+    edgeWord:         "EDGE",
+    evenMatch:        "Evenly matched · could go either way",
+    keyReads:         "KEY READS",
   },
   pt: {
     // ── AppBar (top-right header) ─────────────────────────
@@ -210,6 +215,11 @@ const T = {
     undrafted:        "SEM DRAFT",
     newDraft:         "NOVO DRAFT",
     slots:            "SLOTS",
+    battleAnalysis:   "LEITURA DA BATALHA",
+    powerIndex:       "ÍNDICE DE PODER",
+    edgeWord:         "VANTAGEM",
+    evenMatch:        "Times equilibrados · pode ir pra qualquer lado",
+    keyReads:         "PONTOS-CHAVE",
   },
 }
 

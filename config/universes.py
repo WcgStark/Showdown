@@ -573,6 +573,7 @@ _JUJUTSU_CHARACTERS = [
     "Suguru Geto", "Haruta Shigemo", "Toji Fushiguro",
     # Culling Game (parcial)
     "Kirara Hoshi", "Higuruma Hiromi", "Reggie Star", "Remi", "Ryu Ishigori", "Takako Uro",
+    "Dhruv Lakdawalla", "Kurourushi",
     # Outros
     "Junpei Yoshino", "Riko Amanai", "Misato Kuroi",
     # Força incerta — comentados até decidir posição no draft

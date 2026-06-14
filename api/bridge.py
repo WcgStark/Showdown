@@ -9,6 +9,7 @@ from config.universes import ALL_UNIVERSES
 from config.arenas import ARENAS_BY_UNIVERSE
 from application.services.game_service import GameService
 from application.managers.session_manager import SessionManager
+from domain.rules.analysis import analyze_match
 import updater as _updater
 
 
@@ -183,6 +184,21 @@ class GameAPI:
             if self._history:
                 self._history.pop()
         return self._game_state()
+
+    # ── Analysis ──────────────────────────────────────────────────────────────
+
+    def analyze(self) -> dict:
+        """Spoiler-safe battle analysis of the locked-in rosters. Returns
+        {"available": False} for universes without authored power profiles."""
+        m = self._session.match
+        if m is None:
+            return {"available": False}
+        return analyze_match(
+            m.universe.key,
+            m.filter_key,
+            m.players[0].slots,
+            m.players[1].slots,
+        )
 
     # ── Update ────────────────────────────────────────────────────────────────
 

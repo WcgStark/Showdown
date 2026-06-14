@@ -342,7 +342,8 @@ const App = () => {
             p1={p1 || "Player 1"}
             p2={p2 || "Player 2"}
             draft={draft}
-            onRestart={handleRestart}
+            onMenu={handleRestart}
+            onPlayers={() => setScreen("players")}
             imgUrl={imgUrl}
             version={config.version}
             lang={lang}
