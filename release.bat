@@ -13,6 +13,17 @@ if "%1"=="" (
 set VERSION=%1
 set GIT="C:\Program Files\Git\bin\git.exe"
 
+:: Valida o formato X.Y.Z — evita publicar uma versao invalida tipo "bat"
+echo %VERSION%| findstr /r "^[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*$" >nul
+if errorlevel 1 (
+    echo.
+    echo  ERRO: versao invalida "%VERSION%". Use o formato X.Y.Z
+    echo  Exemplo: release.bat 1.3.2
+    echo.
+    pause
+    exit /b 1
+)
+
 echo.
 echo === RELEASE v%VERSION% ===
 echo.
@@ -33,6 +44,9 @@ cd /d "%~dp0"
 :: [3/4] Build do .exe
 echo.
 echo [3/4] Gerando .exe...
+:: Remove o .exe da build anterior de dentro de dist\ — senao o PyInstaller
+:: empacota o exe antigo dentro do novo, inflando o tamanho a cada release.
+if exist "dist\ShowdownDraft.exe" del /q "dist\ShowdownDraft.exe"
 pyinstaller --noconfirm showdown.spec
 if errorlevel 1 ( echo ERRO ao gerar .exe! & pause & exit /b 1 )
 
@@ -43,7 +57,16 @@ echo [4/4] Publicando no GitHub...
 %GIT% add frontend\src api assets *.py *.bat *.spec
 %GIT% commit -m "release v%VERSION%"
 %GIT% push
-gh release create v%VERSION% "dist\ShowdownDraft.exe" --title "Versao %VERSION%" --notes ""
+if errorlevel 1 (
+    echo.
+    echo  ERRO no push! O remoto provavelmente tem commits novos.
+    echo  Rode:  git pull --rebase   e depois execute o release.bat de novo.
+    echo  (Release NAO publicado, para nao gerar versao quebrada.)
+    echo.
+    pause
+    exit /b 1
+)
+gh release create v%VERSION% "dist\ShowdownDraft.exe" --repo WcgStark/ShowdownDraft --title "Versao %VERSION%" --notes ""
 if errorlevel 1 ( echo ERRO ao publicar no GitHub! & pause & exit /b 1 )
 
 echo.

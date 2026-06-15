@@ -15,6 +15,9 @@ if errorlevel 1 (
 echo.
 echo [2/2] Gerando .exe...
 cd /d "%~dp0"
+:: Remove o .exe da build anterior — senao o PyInstaller empacota o exe antigo
+:: dentro do novo, inflando o tamanho a cada build.
+if exist "dist\ShowdownDraft.exe" del /q "dist\ShowdownDraft.exe"
 pyinstaller --noconfirm showdown.spec
 if errorlevel 1 (
     echo ERRO ao gerar o .exe!
