@@ -14,6 +14,7 @@ const UNIVERSE_UI = {
   invincible: { codename: "VILTRUM" },
   jojo:       { codename: "STARDUST" },
   jujutsu:    { codename: "JUJUTSU HIGH" },
+  dragonball: { codename: "TENKAICHI" },
 }
 
 const enrichUniverse = u => ({

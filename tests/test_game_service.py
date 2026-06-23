@@ -8,7 +8,7 @@ import pytest
 from application.services.game_service import GameService
 from config.universes import ONEPIECE, BLEACH, JOJO
 
-TESTE_POOL_OP = {"Monkey D. Luffy", "Monkey D. Garp", "Edward Newgate"}
+TESTE_POOL_OP = {"Monkey D. Luffy", "Edward Newgate"}
 
 TESTE_POOL_BLEACH = {
     "Ichigo Kurosaki", "Sousuke Aizen", "Yhwach",

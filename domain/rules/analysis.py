@@ -151,6 +151,7 @@ def analyze_match(universe_key: str, filter_key: str,
     p1_tags: set[str] = set()
     p2_tags: set[str] = set()
     p1_dom_adv = p2_dom_adv = False
+    p1_coc = p2_coc = False
     for entry in rows:
         pos = entry["position"]
         for side in ("p1", "p2"):
@@ -159,13 +160,17 @@ def analyze_match(universe_key: str, filter_key: str,
                 continue
             to_p1 = (side == "p1") != e["defects"]   # xor: defector flips sides
             tags = set(e["tags"])
-            is_domain_combat = pos != "Healer" and "domain" in tags
+            is_combat = pos != "Healer"
+            is_domain_combat = is_combat and "domain" in tags
+            is_coc_combat = is_combat and "conqueror" in tags
             if to_p1:
                 p1_total += e["score"]; p1_tags |= tags
                 if is_domain_combat: p1_dom_adv = True
+                if is_coc_combat: p1_coc = True
             else:
                 p2_total += e["score"]; p2_tags |= tags
                 if is_domain_combat: p2_dom_adv = True
+                if is_coc_combat: p2_coc = True
 
     b1, l1 = _synergy_bonus(p1_tags)
     b2, l2 = _synergy_bonus(p2_tags)
@@ -190,18 +195,33 @@ def analyze_match(universe_key: str, filter_key: str,
             b2 += DOMAIN_ADV
             l2.append(f"Vantagem de domínio +{DOMAIN_ADV} — oponente sem expansão.")
 
+    # Conqueror's Haki (One Piece): advanced CoC in combat overwhelms a side with
+    # none. Two CoC users cancel out (a clash of wills). Orthogonal to the domain
+    # edge above — in practice only one mechanic exists in any given universe.
+    CONQUEROR_ADV = 22
+    coc_clash = p1_coc and p2_coc
+    if p1_coc and not p2_coc:
+        b1 += CONQUEROR_ADV
+        l1.append(f"Haki do Rei +{CONQUEROR_ADV} — domina lutadores sem o Haki da Conquista.")
+    if p2_coc and not p1_coc:
+        b2 += CONQUEROR_ADV
+        l2.append(f"Haki do Rei +{CONQUEROR_ADV} — domina lutadores sem o Haki da Conquista.")
+
     p1_total += b1
     p2_total += b2
 
+    # No ties: a match always resolves to a winner. On the astronomically rare
+    # exact-equal total, the edge goes to P1.
     margin = p1_total - p2_total
-    tie_band = 0.04 * max(p1_total, p2_total, 1)   # tie if within 4% of the leader
-    verdict = "tie" if abs(margin) < tie_band else ("p1" if margin > 0 else "p2")
+    verdict = "p1" if margin >= 0 else "p2"
 
     interactions = _interactions(p1_tags, p2_tags)
     if cut_by_p1:
         interactions.append("P1 cortou pela metade a vantagem de domínio do oponente (anti-domínio).")
     if cut_by_p2:
         interactions.append("P2 cortou pela metade a vantagem de domínio do oponente (anti-domínio).")
+    if coc_clash:
+        interactions.append("Choque de Haki do Rei — as vontades se anulam, sem vantagem para nenhum lado.")
 
     return {
         "available": True,

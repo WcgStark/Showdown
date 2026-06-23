@@ -610,6 +610,94 @@ JUJUTSU = Universe(
 
 
 # ──────────────────────────────────────────────
+# Dragon Ball (Z + Super, até o Torneio do Poder + filmes)
+# ──────────────────────────────────────────────
+
+def _build_dragonball_theme() -> Theme:
+    return Theme(
+        bg="#0E1A2B",
+        panel_bg="#15263D",
+        border="#FF8C1A",
+        title_fg="#FF8C1A",
+        text_fg="#FFE0B0",
+        text_secondary="#9FC0E0",
+        button_start_bg="#2E7DD1",
+        button_start_fg="white",
+        font_family="Arial",
+        icon="🐉",
+        entry_bg="#10203A",
+        entry_fg="#FFE0B0",
+        entry_insert="#FF8C1A",
+    )
+
+
+_DRAGONBALL_CHARACTERS = [
+    # Dragon Ball clássico
+    "Bulma", "Chi-Chi", "Yajirobe", "Korin", "Kami", "Mr. Popo",
+    "King Piccolo", "Tao Pai Pai", "Pilaf", "Launch",
+    # Guerreiros Z (heróis)
+    "Goku", "Vegeta", "Gohan", "Piccolo", "Krillin", "Tien Shinhan", "Yamcha",
+    "Chiaotzu", "Master Roshi", "Goten", "Trunks", "Future Trunks", "Gotenks",
+    "Vegito", "Android 18", "Android 17", "Android 16", "Majin Buu",
+    "Mr. Satan", "Videl", "Dende",
+    # Saga dos Saiyajins
+    "Raditz", "Nappa", "King Kai",
+    # Saga Freeza
+    "Frieza", "Zarbon", "Dodoria", "Captain Ginyu", "Recoome", "Burter",
+    "Jeice", "Guldo", "King Cold", "Nail", "Guru", "Bardock",
+    # Sagas dos Androides / Cell
+    "Cell", "Dr. Gero", "Android 19",
+    # Saga Majin Boo
+    "Babidi", "Dabura", "Supreme Kai", "Kibito", "Old Kai", "Uub",
+    # DBS — Deuses e Anjos
+    "Beerus", "Whis", "Jaco",
+    # Torneio dos Universos 6 e 7
+    "Hit", "Champa", "Vados", "Cabba", "Frost", "Botamo", "Magetta",
+    # Saga do Trunks do Futuro
+    "Goku Black", "Zamasu",
+    # Torneio do Poder (fim do anime)
+    "Jiren", "Toppo", "Dyspo", "Caulifla", "Kale", "Kefla", "Grand Priest",
+    # Filmes
+    "Broly", "Gogeta", "Cooler", "Turles", "Janemba", "Bojack", "Paragus",
+]
+
+# Exclusivos de filme — removidos da pool no modo "anime" (sem spoilers de filme).
+_DRAGONBALL_MOVIES_ONLY = {
+    "Broly", "Gogeta", "Cooler", "Turles", "Janemba", "Bojack", "Paragus",
+}
+
+DRAGONBALL = Universe(
+    key="dragonball",
+    name="Dragon Ball",
+    api_url="https://dragonball.fandom.com/api.php",
+    asset_folder="assets/dragonball",
+    characters=_DRAGONBALL_CHARACTERS,
+    positions=POSITIONS_STANDARD,
+    theme=_build_dragonball_theme(),
+    default_filter="completo",
+    filters={
+        "completo": FilterSet(
+            label="🐉  Completo  (Anime até o Torneio do Poder + Filmes)",
+            description="Todos os personagens, incluindo Broly e as formas de filme.",
+            exclude=set(),
+        ),
+        "anime": FilterSet(
+            label="📺  Anime  (até o Torneio do Poder)",
+            description="Só até o fim do anime; remove os exclusivos de filme.",
+            exclude=_DRAGONBALL_MOVIES_ONLY,
+        ),
+        "teste": FilterSet(
+            label="🧪  Teste",
+            description="Pool de teste reduzido.",
+            exclude=set(_DRAGONBALL_CHARACTERS) - {
+                "Goku", "Vegeta", "Jiren", "Frieza", "Broly",
+            },
+        ),
+    },
+)
+
+
+# ──────────────────────────────────────────────
 # Registry — single source of truth
 # ──────────────────────────────────────────────
 
@@ -620,4 +708,5 @@ ALL_UNIVERSES: dict[str, Universe] = {
     "invincible": INVINCIBLE,
     "jojo":       JOJO,
     "jujutsu":    JUJUTSU,
+    "dragonball": DRAGONBALL,
 }

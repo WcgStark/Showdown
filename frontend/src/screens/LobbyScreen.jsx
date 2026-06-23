@@ -11,6 +11,7 @@ const LANDSCAPE = {
   invincible: "./landscape/landscape%20invincible.jpg",
   jojo:       "./landscape/landscape%20jojo.jpg",
   jujutsu:    "./landscape/landscape%20jujutsu.jpg",
+  dragonball: "./landscape/landscape%20dragonball.jpg",
 }
 
 const UniverseCard = ({ universe, active, onHover, onClick }) => {
@@ -67,11 +68,39 @@ const UniverseCard = ({ universe, active, onHover, onClick }) => {
   )
 }
 
+const PAGE_SIZE = 6
+
 const LobbyScreen =({ universes, onSelect, selectedId, setSelectedId, version, uiVolume, onUiVolumeChange, sfxVolume, onSfxVolumeChange, musicVolume, onMusicVolumeChange, quality, onQualityChange, lang, onLangChange, keybinds, onKeybindsChange }) => {
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [page, setPage] = useState(0)
   const sel = universes.find(u => u.id === selectedId) || universes[0]
 
-  // Keyboard: confirm selection / close settings
+  const pageCount = Math.max(1, Math.ceil(universes.length / PAGE_SIZE))
+  const safePage = Math.min(page, pageCount - 1)
+  const visible = universes.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE)
+  // When paginated, keep the full 3×2 page layout so a lone card (e.g. Dragon
+  // Ball on its own page) sits in the top-left slot at the same size as the
+  // others, instead of stretching to fill the whole grid.
+  const cols = pageCount > 1 ? 3 : (universes.length <= 4 ? 2 : 3)
+  const rows = pageCount > 1 ? Math.ceil(PAGE_SIZE / cols) : Math.ceil(universes.length / cols)
+
+  // Returns true if the page actually changed. Does NOT play the UI sound: a
+  // global mousedown listener (sounds.js) already fires playUi() for every
+  // <button> click, so the arrow buttons would double up. Keyboard nav plays it
+  // explicitly below.
+  const goPage = delta => {
+    const next = Math.min(Math.max(safePage + delta, 0), pageCount - 1)
+    if (next !== safePage) { setPage(next); return true }
+    return false
+  }
+
+  // Preload every landscape so flipping pages shows images instantly (no decode
+  // flash on remount).
+  useEffect(() => {
+    Object.values(LANDSCAPE).forEach(src => { const img = new Image(); img.src = src })
+  }, [])
+
+  // Keyboard: confirm selection / close settings / page nav
   useEffect(() => {
     const onKey = e => {
       if (settingsOpen) {
@@ -79,10 +108,12 @@ const LobbyScreen =({ universes, onSelect, selectedId, setSelectedId, version, u
         return
       }
       if (e.code === keybinds.confirm) { e.preventDefault(); onSelect(sel.id) }
+      else if (e.code === "ArrowRight") { e.preventDefault(); if (goPage(1)) playUi() }
+      else if (e.code === "ArrowLeft") { e.preventDefault(); if (goPage(-1)) playUi() }
     }
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
-  }, [settingsOpen, keybinds, sel.id, onSelect])
+  }, [settingsOpen, keybinds, sel.id, onSelect, safePage, pageCount])
 
   return (
     <div className={`stage acc-${sel.id}`} data-screen-label="01 Lobby">
@@ -108,15 +139,15 @@ const LobbyScreen =({ universes, onSelect, selectedId, setSelectedId, version, u
         </h1>
       </div>
 
-      {/* Card grid — adapts to universe count */}
+      {/* Card grid — paginated, 6 per page (kept at a fixed 3×2 layout) */}
       <div style={{
         position: "absolute", top: 340, left: 120, right: 120, bottom: 200,
         display: "grid",
-        gridTemplateColumns: `repeat(${universes.length <= 4 ? 2 : 3}, 1fr)`,
-        gridTemplateRows: `repeat(${Math.ceil(universes.length / (universes.length <= 4 ? 2 : 3))}, 1fr)`,
+        gridTemplateColumns: `repeat(${cols}, 1fr)`,
+        gridTemplateRows: `repeat(${rows}, 1fr)`,
         gap: 28, zIndex: 3,
       }}>
-        {universes.map(u => (
+        {visible.map(u => (
           <UniverseCard
             key={u.id}
             universe={u}
@@ -126,6 +157,62 @@ const LobbyScreen =({ universes, onSelect, selectedId, setSelectedId, version, u
           />
         ))}
       </div>
+
+      {/* Page navigation arrows */}
+      {pageCount > 1 && (
+        <>
+          {safePage > 0 && (
+            <button
+              className="btn btn-ghost"
+              onMouseEnter={playUiHover}
+              onClick={() => goPage(-1)}
+              aria-label="Previous page"
+              style={{
+                position: "absolute", left: 36, top: "52%", transform: "translateY(-50%)",
+                zIndex: 4, width: 56, height: 56, borderRadius: "50%",
+                display: "grid", placeItems: "center", padding: 0,
+              }}
+            >
+              <span style={{ transform: "rotate(180deg)", display: "inline-flex" }}>
+                <Icon name="arrow" size={22} />
+              </span>
+            </button>
+          )}
+          {safePage < pageCount - 1 && (
+            <button
+              className="btn btn-ghost"
+              onMouseEnter={playUiHover}
+              onClick={() => goPage(1)}
+              aria-label="Next page"
+              style={{
+                position: "absolute", right: 36, top: "52%", transform: "translateY(-50%)",
+                zIndex: 4, width: 56, height: 56, borderRadius: "50%",
+                display: "grid", placeItems: "center", padding: 0,
+              }}
+            >
+              <Icon name="arrow" size={22} />
+            </button>
+          )}
+          {/* Page dots */}
+          <div style={{
+            position: "absolute", bottom: 150, left: 0, right: 0, zIndex: 4,
+            display: "flex", justifyContent: "center", gap: 10,
+          }}>
+            {Array.from({ length: pageCount }).map((_, i) => (
+              <span
+                key={i}
+                onClick={() => { playUi(); setPage(i) }}
+                style={{
+                  width: 8, height: 8, borderRadius: "50%", cursor: "pointer",
+                  background: i === safePage ? "var(--acc)" : "var(--ink-3)",
+                  boxShadow: i === safePage ? "0 0 8px var(--acc)" : "none",
+                  transition: "background 150ms ease",
+                }}
+              />
+            ))}
+          </div>
+        </>
+      )}
 
       {/* Footer bar */}
       <div style={{

@@ -57,10 +57,10 @@ class UniversePower:
 # ──────────────────────────────────────────────────────────────────────────────
 
 POSITION_ROLE: dict[str, set[str]] = {
-    "Captain":      {"leadership", "domain", "bruiser", "ace"},
+    "Captain":      {"leadership", "domain", "bruiser", "ace", "conqueror"},
     "Vice Captain": {"leadership", "versatility", "bruiser"},
     "Tank":         {"tank", "durability", "lockdown", "guard"},
-    "Duelist":      {"bruiser", "burst", "aoe", "ace"},
+    "Duelist":      {"bruiser", "burst", "aoe", "ace", "conqueror"},
     "Healer":       {"heal", "sustain", "revive"},
     "Support":      {"buff", "debuff", "utility", "versatility", "recon"},
     "Traitor":      {"sabotage", "betrayal", "manipulation"},
@@ -71,8 +71,20 @@ POSITION_ROLE: dict[str, set[str]] = {
 # Registry — single source of truth, mirrors ALL_UNIVERSES keys.
 # ──────────────────────────────────────────────────────────────────────────────
 
+from config.power_profiles.bleach import BLEACH_POWER
+from config.power_profiles.dragonball import DRAGONBALL_POWER
+from config.power_profiles.invincible import INVINCIBLE_POWER
+from config.power_profiles.jojo import JOJO_POWER
 from config.power_profiles.jujutsu import JUJUTSU_POWER
+from config.power_profiles.naruto import NARUTO_POWER
+from config.power_profiles.onepiece import ONEPIECE_POWER
 
 POWER_DATA: dict[str, UniversePower] = {
-    "jujutsu": JUJUTSU_POWER,
+    "bleach":     BLEACH_POWER,
+    "dragonball": DRAGONBALL_POWER,
+    "invincible": INVINCIBLE_POWER,
+    "jojo":       JOJO_POWER,
+    "jujutsu":    JUJUTSU_POWER,
+    "naruto":     NARUTO_POWER,
+    "onepiece":   ONEPIECE_POWER,
 }
