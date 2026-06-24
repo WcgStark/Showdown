@@ -632,38 +632,110 @@ def _build_dragonball_theme() -> Theme:
 
 
 _DRAGONBALL_CHARACTERS = [
-    # Dragon Ball clássico
+    # ─── Dragon Ball clássico ───
     "Bulma", "Chi-Chi", "Yajirobe", "Korin", "Kami", "Mr. Popo",
     "King Piccolo", "Tao Pai Pai", "Pilaf", "Launch",
-    # Guerreiros Z (heróis)
+    "Grandpa Gohan", "Oolong", "Puar", "Ox-King", "Turtle",
+    "Fortuneteller Baba", "Bora", "Upa", "Suno", "Nam", "Giran",
+    "Bacterian", "Ranfan", "Annin", "Spike the Devil Man", "Mai", "Shu",
+    "King Chappa", "Pamput", "Hasky",
+    # Exército da Red Ribbon
+    "Commander Red", "Staff Officer Black", "General White",
+    "General Blue", "Colonel Silver", "Major Metallitron",
+    "Ninja Murasaki", "Android 8", "Buyon",
+    # Prole do King Piccolo
+    "Tambourine", "Cymbal", "Piano", "Drum",
+
+    # ─── Guerreiros Z (heróis) ───
     "Goku", "Vegeta", "Gohan", "Piccolo", "Krillin", "Tien Shinhan", "Yamcha",
     "Chiaotzu", "Master Roshi", "Goten", "Trunks", "Future Trunks", "Gotenks",
     "Vegito", "Android 18", "Android 17", "Android 16", "Majin Buu",
-    "Mr. Satan", "Videl", "Dende",
-    # Saga dos Saiyajins
-    "Raditz", "Nappa", "King Kai",
-    # Saga Freeza
+    "Mr. Satan", "Videl", "Dende", "Pan", "Bulla", "Marron", "Bee",
+
+    # ─── Saga dos Saiyajins ───
+    "Raditz", "Nappa", "King Kai", "Saibamen", "Bubbles", "Gregory",
+    "Princess Snake", "Future Gohan", "King Vegeta", "Tarble",
+
+    # ─── Saga Freeza ───
     "Frieza", "Zarbon", "Dodoria", "Captain Ginyu", "Recoome", "Burter",
     "Jeice", "Guldo", "King Cold", "Nail", "Guru", "Bardock",
-    # Sagas dos Androides / Cell
-    "Cell", "Dr. Gero", "Android 19",
-    # Saga Majin Boo
+    "Cui", "Appule", "Orlen", "Moori", "Cargo",
+
+    # ─── Sagas dos Androides / Cell ───
+    "Cell", "Dr. Gero", "Android 19", "Cell Jr.",
+
+    # ─── Saga Majin Boo ───
     "Babidi", "Dabura", "Supreme Kai", "Kibito", "Old Kai", "Uub",
-    # DBS — Deuses e Anjos
-    "Beerus", "Whis", "Jaco",
-    # Torneio dos Universos 6 e 7
+    "Kid Buu", "Super Buu", "Evil Buu", "Good Buu", "Bibidi",
+    "Kibito Kai", "Spopovich", "Yamu", "Pui Pui", "Yakon", "Mighty Mask",
+
+    # ─── DBS — Deuses, Anjos e Reis ───
+    "Beerus", "Whis", "Jaco", "Zeno", "Future Zeno", "Grand Priest",
+    "Monaka", "Gowasu",
+
+    # ─── Torneio dos Universos 6 e 7 ───
     "Hit", "Champa", "Vados", "Cabba", "Frost", "Botamo", "Magetta",
-    # Saga do Trunks do Futuro
-    "Goku Black", "Zamasu",
-    # Torneio do Poder (fim do anime)
-    "Jiren", "Toppo", "Dyspo", "Caulifla", "Kale", "Kefla", "Grand Priest",
-    # Filmes
+
+    # ─── Saga do Trunks do Futuro / Goku Black ───
+    "Goku Black", "Zamasu", "Fused Zamasu", "Future Mai",
+
+    # ─── Torneio do Poder — Universo 11 (Tropas do Orgulho) ───
+    "Jiren", "Toppo", "Dyspo", "Belmod", "Marcarita",
+    "Kahseral", "Tupper", "Cocotte", "Vuon", "Zoiray", "Kettle",
+
+    # ─── Torneio do Poder — Universo 6 ───
+    "Caulifla", "Kale", "Kefla", "Saonel", "Pirina",
+
+    # ─── Torneio do Poder — Universo 2 ───
+    "Ribrianne", "Kakunsa", "Rozie", "Heles", "Pell", "Sour",
+
+    # ─── Torneio do Poder — Universo 3 ───
+    "Anilaza", "Paparoni", "Koitsukai", "Borareta", "Panchia",
+    "Maji Kayo", "Mosco", "Campari",
+
+    # ─── Torneio do Poder — Universo 4 ───
+    "Quitela", "Dercori", "Ganos", "Shantza", "Damon",
+    "Caway", "Nink", "Monna", "Cognac",
+
+    # ─── Torneio do Poder — Universo 9 ───
+    "Bergamo", "Basil", "Lavender", "Sidra", "Roh",
+    "Comfrey", "Sorrel", "Oregano", "Hop", "Chappil",
+
+    # ─── Torneio do Poder — Universo 10 ───
+    "Rumsshi", "Obni", "Murichim", "Lilibeu", "Methiop", "Cus",
+
+    # ─── Dragon Ball Super: Super Hero ───
+    "Gamma 1", "Gamma 2", "Dr. Hedo", "Magenta", "Carmine", "Cell Max",
+
+    # ─── Dragon Ball GT ───
+    "Baby", "Super Android 17", "General Rilldo", "Dr. Myuu",
+    "Giru", "Ledgic", "Don Kee", "Sigma Force", "Luud", "Mutchy",
+    "Bon Para", "Son Para", "Don Para", "Zoonama",
+    # Dragões Sombrios (Shadow Dragons)
+    "Syn Shenron", "Haze Shenron", "Rage Shenron",
+    "Oceanus Shenron", "Naturon Shenron", "Eis Shenron", "Nuova Shenron",
+    "Goku Jr.", "Vegeta Jr.",
+
+    # ─── Dragon Ball Daima ───
+    "Glorio", "Panzy", "Gomah", "Degesu", "Dr. Arinsu", "Neva",
+    "Tamagami", "Majin Kuu", "Duu", "Marba", "Hybis", "Kadan", "Abura",
+
+    # ─── Filmes ───
     "Broly", "Gogeta", "Cooler", "Turles", "Janemba", "Bojack", "Paragus",
+    "Lord Slug", "Garlic Jr.", "Tapion", "Hirudegarn", "Dr. Wheelo",
+    "Salza", "Dore", "Neiz", "Android 13", "Android 14",
+    "Android 15", "Hatchiyack", "Zangya", "Bido", "Bujin", "Gokua",
+    "Cheelai", "Lemo",
 ]
 
 # Exclusivos de filme — removidos da pool no modo "anime" (sem spoilers de filme).
+# GT e Daima NÃO entram aqui: continuam disponíveis no modo "anime".
 _DRAGONBALL_MOVIES_ONLY = {
     "Broly", "Gogeta", "Cooler", "Turles", "Janemba", "Bojack", "Paragus",
+    "Lord Slug", "Garlic Jr.", "Tapion", "Hirudegarn", "Dr. Wheelo",
+    "Salza", "Dore", "Neiz", "Android 13", "Android 14",
+    "Android 15", "Hatchiyack", "Zangya", "Bido", "Bujin", "Gokua",
+    "Cheelai", "Lemo",
 }
 
 DRAGONBALL = Universe(

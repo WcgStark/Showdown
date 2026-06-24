@@ -22,3 +22,6 @@ frontend/node_modules/
 *.log
 .DS_Store
 Thumbs.db
+
+# Doc interno de release — não publicar no GitHub
+COMO_LANCAR.md

@@ -14,7 +14,7 @@ const LANDSCAPE = {
   dragonball: "./landscape/landscape%20dragonball.jpg",
 }
 
-const UniverseCard = ({ universe, active, onHover, onClick }) => {
+const UniverseCard = ({ universe, active, hidden, onHover, onClick }) => {
   const accStyle = { "--acc": universe.accent }
   const landscapeSrc = LANDSCAPE[universe.id]
   return (
@@ -24,6 +24,9 @@ const UniverseCard = ({ universe, active, onHover, onClick }) => {
       className={`panel scanlines ${active ? "ring-on" : ""}`}
       style={{
         ...accStyle,
+        // Off-page cards stay mounted (display:none) so their landscape stays
+        // decoded — flipping pages never re-decodes, the image is just there.
+        display: hidden ? "none" : undefined,
         position: "relative",
         cursor: "pointer",
         overflow: "hidden",
@@ -36,6 +39,9 @@ const UniverseCard = ({ universe, active, onHover, onClick }) => {
         <img
           src={landscapeSrc}
           alt=""
+          loading="eager"
+          decoding="sync"
+          fetchpriority="high"
           style={{
             position: "absolute", inset: 0,
             width: "100%", height: "100%",
@@ -77,7 +83,6 @@ const LobbyScreen =({ universes, onSelect, selectedId, setSelectedId, version, u
 
   const pageCount = Math.max(1, Math.ceil(universes.length / PAGE_SIZE))
   const safePage = Math.min(page, pageCount - 1)
-  const visible = universes.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE)
   // When paginated, keep the full 3×2 page layout so a lone card (e.g. Dragon
   // Ball on its own page) sits in the top-left slot at the same size as the
   // others, instead of stretching to fill the whole grid.
@@ -94,10 +99,14 @@ const LobbyScreen =({ universes, onSelect, selectedId, setSelectedId, version, u
     return false
   }
 
-  // Preload every landscape so flipping pages shows images instantly (no decode
-  // flash on remount).
+  // Preload AND decode every landscape up front so the off-page card (e.g.
+  // Dragon Ball on page 2) is fully ready before you ever flip to it.
   useEffect(() => {
-    Object.values(LANDSCAPE).forEach(src => { const img = new Image(); img.src = src })
+    Object.values(LANDSCAPE).forEach(src => {
+      const img = new Image()
+      img.src = src
+      if (img.decode) img.decode().catch(() => {})
+    })
   }, [])
 
   // Keyboard: confirm selection / close settings / page nav
@@ -147,11 +156,12 @@ const LobbyScreen =({ universes, onSelect, selectedId, setSelectedId, version, u
         gridTemplateRows: `repeat(${rows}, 1fr)`,
         gap: 28, zIndex: 3,
       }}>
-        {visible.map(u => (
+        {universes.map((u, i) => (
           <UniverseCard
             key={u.id}
             universe={u}
             active={u.id === sel.id}
+            hidden={Math.floor(i / PAGE_SIZE) !== safePage}
             onHover={() => { playUiHover(); setSelectedId(u.id) }}
             onClick={() => { playUi(); onSelect(u.id) }}
           />

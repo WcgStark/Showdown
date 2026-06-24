@@ -134,6 +134,85 @@ const RosterList = ({ side, player, draft, universe, align, imgUrl, lang }) => (
   </div>
 )
 
+// Who wins this single position, and by how much (defectors count for the
+// other side, mirroring the running-total rule).
+const laneOutcome = row => {
+  let a = 0, b = 0
+  if (row.p1) row.p1.defects ? (b += row.p1.score) : (a += row.p1.score)
+  if (row.p2) row.p2.defects ? (a += row.p2.score) : (b += row.p2.score)
+  const delta = r0(Math.abs(a - b))
+  const side = a === b ? "tie" : a > b ? "p1" : "p2"
+  return { side, delta }
+}
+
+const AbilityNote = ({ e, align }) => {
+  const left = align === "left"
+  const abilities = e?.abilities || []
+  return (
+    <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 3, textAlign: left ? "right" : "left" }}>
+      {abilities.length === 0 ? (
+        <span style={{ fontFamily: "var(--f-mono)", fontSize: 9.5, color: "var(--ink-4)", letterSpacing: "0.1em" }}>—</span>
+      ) : abilities.slice(0, 3).map((txt, i) => (
+        <span key={i} style={{ fontSize: 10.5, lineHeight: 1.3, color: "var(--ink-2)" }}>{txt}</span>
+      ))}
+    </div>
+  )
+}
+
+// One settled position. Hover enlarges the row and reveals the individual
+// battle readout (lane winner + each fighter's visible abilities).
+const SettledRow = ({ row, p1, p2, extMap, imgUrl, lang }) => {
+  const [hover, setHover] = useState(false)
+  const { side, delta } = laneOutcome(row)
+  const isTie = side === "tie"
+  const winColor = isTie ? "var(--ink-2)" : "var(--acc)"
+  const winName = side === "p1" ? (p1 || "PLAYER ONE")
+    : side === "p2" ? (p2 || "PLAYER TWO")
+    : t('evenMatch', lang)
+  return (
+    <div
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        borderRadius: 9, background: "var(--bg-1)",
+        border: `1px solid ${hover ? "var(--acc-line)" : "var(--line)"}`,
+        boxShadow: hover ? "0 8px 30px color-mix(in oklab, var(--acc) 24%, transparent)" : "none",
+        transform: hover ? "scale(1.02)" : "scale(1)",
+        position: "relative", zIndex: hover ? 6 : 1,
+        transition: "transform .2s cubic-bezier(.2,.8,.2,1), box-shadow .2s ease, border-color .2s ease",
+        animation: "popIn .4s ease",
+      }}
+    >
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 128px 1fr", alignItems: "center", gap: 12, padding: "6px 14px" }}>
+        <Cell e={row.p1} align="left" extMap={extMap} imgUrl={imgUrl} />
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontFamily: "var(--f-mono)", fontSize: 10.5, letterSpacing: "0.16em", color: "var(--ink-3)", textTransform: "uppercase" }}>{row.position}</div>
+          <div style={{
+            marginTop: 3, fontFamily: "var(--f-mono)", fontSize: 9.5, letterSpacing: "0.08em",
+            color: winColor, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+            opacity: hover ? 1 : 0, transition: "opacity .2s ease",
+          }}>
+            {isTie ? t('evenMatch', lang) : `▲ ${winName} +${delta}`}
+          </div>
+        </div>
+        <Cell e={row.p2} align="right" extMap={extMap} imgUrl={imgUrl} />
+      </div>
+      {/* Individual-battle readout — revealed on hover */}
+      <div style={{ maxHeight: hover ? 170 : 0, overflow: "hidden", transition: "max-height .25s ease" }}>
+        <div className="sep" style={{ margin: "0 14px" }} />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 128px 1fr", gap: 12, padding: "8px 14px 10px", alignItems: "start" }}>
+          <AbilityNote e={row.p1} align="left" />
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+            <span className="display" style={{ fontSize: 22, lineHeight: 1, color: winColor }}>{isTie ? "=" : `+${delta}`}</span>
+            <span style={{ fontFamily: "var(--f-mono)", fontSize: 8.5, letterSpacing: "0.14em", color: "var(--ink-3)", textTransform: "uppercase", textAlign: "center" }}>{winName}</span>
+          </div>
+          <AbilityNote e={row.p2} align="right" />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const ResultScreen = ({ universe, p1, p2, draft, onMenu, onPlayers, imgUrl, version, lang }) => {
   const [analysis, setAnalysis] = useState(null)
   const [presented, setPresented] = useState(0)   // positions settled into the list
@@ -254,15 +333,7 @@ const ResultScreen = ({ universe, p1, p2, draft, onMenu, onPlayers, imgUrl, vers
       {/* Settled list */}
       <div style={{ position: "absolute", top: 540, left: 64, right: 64, bottom: 150, display: "flex", flexDirection: "column", gap: 6 }}>
         {hasAnalysis && analysis.rows.slice(0, presented).map((row, i) => (
-          <div key={i} style={{
-            display: "grid", gridTemplateColumns: "1fr 128px 1fr", alignItems: "center", gap: 12,
-            padding: "6px 14px", borderRadius: 9, background: "var(--bg-1)", border: "1px solid var(--line)",
-            animation: "popIn .4s ease",
-          }}>
-            <Cell e={row.p1} align="left" extMap={extMap} imgUrl={imgUrl} />
-            <div style={{ textAlign: "center", fontFamily: "var(--f-mono)", fontSize: 10.5, letterSpacing: "0.16em", color: "var(--ink-3)", textTransform: "uppercase" }}>{row.position}</div>
-            <Cell e={row.p2} align="right" extMap={extMap} imgUrl={imgUrl} />
-          </div>
+          <SettledRow key={i} row={row} p1={p1} p2={p2} extMap={extMap} imgUrl={imgUrl} lang={lang} />
         ))}
       </div>
 
